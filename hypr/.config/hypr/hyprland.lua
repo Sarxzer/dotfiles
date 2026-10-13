@@ -121,6 +121,9 @@ hl.animation({ leaf = "workspacesIn",  enabled = true,  speed = 1.21, bezier = "
 hl.animation({ leaf = "workspacesOut", enabled = true,  speed = 1.94, bezier = "almostLinear", style = "fade" })
 hl.animation({ leaf = "zoomFactor",    enabled = true,  speed = 7,    bezier = "quick" })
 
+-- Special workspaces (F12 dropdown) slide down from the top
+hl.animation({ leaf = "specialWorkspace", enabled = true, speed = 4, bezier = "easeOutQuint", style = "slidevert" })
+
 hl.config({
     dwindle = {
         preserve_split = true,
@@ -194,6 +197,12 @@ hl.bind(mainMod .. " + S",     hl.dsp.exec_cmd(ipc .. "panel-toggle control-cent
 hl.bind(mainMod .. " + comma", hl.dsp.exec_cmd(ipc .. "settings-toggle"))
 hl.bind("ALT + Tab",           hl.dsp.exec_cmd(ipc .. "window-switcher hold"))
 
+-- Noctalia screenshots (Print key, plus Super+Shift combos for keyboards without one)
+hl.bind("Print",                       hl.dsp.exec_cmd(ipc .. "screenshot-region"))
+hl.bind("SHIFT + Print",               hl.dsp.exec_cmd(ipc .. "screenshot-fullscreen"))
+hl.bind(mainMod .. " + SHIFT + S",     hl.dsp.exec_cmd(ipc .. "screenshot-region"))
+hl.bind(mainMod .. " + SHIFT + F",     hl.dsp.exec_cmd(ipc .. "screenshot-fullscreen"))
+
 -- Dropdown terminal (special workspace)
 hl.bind("F12", hl.dsp.workspace.toggle_special("dropdown"))
 hl.workspace_rule({ workspace = "special:dropdown", on_created_empty = "kitty --class dropdown" })
@@ -202,6 +211,15 @@ hl.window_rule({
     float = true,
     size  = { 1200, 600 },
 })
+
+-- Apps launched from the dropdown terminal open on your normal workspace
+-- instead of getting trapped in the dropdown
+hl.on("window.open", function(w)
+local special = hl.get_active_special_workspace()
+if special and special.special and w.class ~= "dropdown" then
+    hl.dispatch(hl.dsp.window.move({ window = w, workspace = hl.get_active_workspace(), follow = true }))
+    end
+    end)
 
 -- Hide everything: jump to an empty workspace, and back
 hl.bind(mainMod .. " + D",         hl.dsp.focus({ workspace = "empty" }))
