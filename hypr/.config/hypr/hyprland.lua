@@ -33,7 +33,11 @@ local fileManager = "dolphin"
 -------------------
 
 hl.on("hyprland.start", function ()
-hl.exec_cmd("noctalia")
+    hl.exec_cmd("noctalia")
+    hl.exec_cmd("/usr/lib/pam_kwallet_init")
+    hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY_CURRENT_DESKTOP")
+    hl.exec_cmd("/usr/lib/polkit-kde-authentication-agent-1")
+    hl.exec_cmd("wl-paste --watch cliphist store")
 end)
 
 
@@ -161,10 +165,10 @@ hl.config({
 hl.config({
     input = {
         -- Change to "fr" if your keyboard is AZERTY
-        kb_layout  = "us",
-        kb_variant = "",
+        kb_layout  = "fr",
+        kb_variant = "us",
         kb_model   = "",
-        kb_options = "",
+        kb_options = "compose:rctrl",
         kb_rules   = "",
 
         follow_mouse = 1,
@@ -204,29 +208,50 @@ hl.bind(mainMod .. " + SHIFT + S",     hl.dsp.exec_cmd(ipc .. "screenshot-region
 hl.bind(mainMod .. " + SHIFT + F",     hl.dsp.exec_cmd(ipc .. "screenshot-fullscreen"))
 
 -- Dropdown terminal (special workspace)
-hl.bind("F12", hl.dsp.workspace.toggle_special("dropdown"))
+hl.bind(mainMod .. " + Q", hl.dsp.workspace.toggle_special("dropdown"))
 hl.workspace_rule({ workspace = "special:dropdown", on_created_empty = "kitty --class dropdown" })
 hl.window_rule({
     match = { class = "dropdown" },
     float = true,
-    size  = { 1200, 600 },
+    size  = { 1400, 800 },
 })
 
 -- Apps launched from the dropdown terminal open on your normal workspace
 -- instead of getting trapped in the dropdown
 hl.on("window.open", function(w)
 local special = hl.get_active_special_workspace()
-if special and special.special and w.class ~= "dropdown" then
-    hl.dispatch(hl.dsp.window.move({ window = w, workspace = hl.get_active_workspace(), follow = true }))
+    if special and special.special and w.class ~= "dropdown" then
+        hl.dispatch(hl.dsp.window.move({ window = w, workspace = hl.get_active_workspace(), follow = true }))
     end
-    end)
+end)
 
 -- Hide everything: jump to an empty workspace, and back
 hl.bind(mainMod .. " + D",         hl.dsp.focus({ workspace = "empty" }))
 hl.bind(mainMod .. " + SHIFT + D", hl.dsp.focus({ workspace = "previous" }))
 
+hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" }))
+
+hl.define_submap("resize", function()
+    hl.bind("left",  hl.dsp.window.resize({ x = -20, y = 0,  relative = true }), { repeating = true })
+    hl.bind("right", hl.dsp.window.resize({ x = 20,  y = 0,  relative = true }), { repeating = true })
+    hl.bind("up",    hl.dsp.window.resize({ x = 0,  y = -20, relative = true }), { repeating = true })
+    hl.bind("down",  hl.dsp.window.resize({ x = 0,  y = 20,  relative = true }), { repeating = true })
+    hl.bind("Escape", hl.dsp.submap("reset"))
+    hl.bind("Return", hl.dsp.submap("reset"))
+end)
+hl.bind(mainMod .. " + R", hl.dsp.submap("resize"))
+
+hl.bind(mainMod .. " + F1", hl.dsp.exec_cmd("kitty --class cheatsheet -e less ~/.config/hypr/keybinds.txt"))
+
+hl.window_rule({
+    name  = "cheatsheet",
+    match = { class = "cheatsheet" },
+    float = true,
+    size  = { 700, 650 },
+})
+
 -- Basics
-hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(terminal))
+-- hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(terminal))
 hl.bind(mainMod .. " + C", hl.dsp.window.close())
 hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch 'hl.dsp.exit()'"))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
@@ -252,79 +277,86 @@ for i = 1, 10 do
     local key = i % 10 -- 10 maps to key 0
     hl.bind(mainMod .. " + " .. key,             hl.dsp.focus({ workspace = i}))
     hl.bind(mainMod .. " + SHIFT + " .. key,     hl.dsp.window.move({ workspace = i }))
-    end
+end
 
-    -- Scroll through existing workspaces with mainMod + scroll
-    hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }))
-    hl.bind(mainMod .. " + mouse_up",   hl.dsp.focus({ workspace = "e-1" }))
+-- Scroll through existing workspaces with mainMod + scroll
+hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }))
+hl.bind(mainMod .. " + mouse_up",   hl.dsp.focus({ workspace = "e-1" }))
 
-    -- Move/resize windows with mainMod + LMB/RMB and dragging
-    hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(),   { mouse = true })
-    hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
+-- Move/resize windows with mainMod + LMB/RMB and dragging
+hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(),   { mouse = true })
+hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
 
-    -- Multimedia keys for volume and LCD brightness
-    hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true, repeating = true })
-    hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"),      { locked = true, repeating = true })
-    hl.bind("XF86AudioMute",        hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"),     { locked = true, repeating = true })
-    hl.bind("XF86AudioMicMute",     hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"),   { locked = true, repeating = true })
-    hl.bind("XF86MonBrightnessUp",  hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%+"),                  { locked = true, repeating = true })
-    hl.bind("XF86MonBrightnessDown",hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%-"),                  { locked = true, repeating = true })
+-- Multimedia keys for volume and LCD brightness
+hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true, repeating = true })
+hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"),      { locked = true, repeating = true })
+hl.bind("XF86AudioMute",        hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"),     { locked = true, repeating = true })
+hl.bind("XF86AudioMicMute",     hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"),   { locked = true, repeating = true })
+hl.bind("XF86MonBrightnessUp",  hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%+"),                  { locked = true, repeating = true })
+hl.bind("XF86MonBrightnessDown",hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%-"),                  { locked = true, repeating = true })
 
-    -- Requires playerctl
-    hl.bind("XF86AudioNext",  hl.dsp.exec_cmd("playerctl next"),       { locked = true })
-    hl.bind("XF86AudioPause", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
-    hl.bind("XF86AudioPlay",  hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
-    hl.bind("XF86AudioPrev",  hl.dsp.exec_cmd("playerctl previous"),   { locked = true })
+-- Requires playerctl
+hl.bind("XF86AudioNext",  hl.dsp.exec_cmd("playerctl next"),       { locked = true })
+hl.bind("XF86AudioPause", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
+hl.bind("XF86AudioPlay",  hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
+hl.bind("XF86AudioPrev",  hl.dsp.exec_cmd("playerctl previous"),   { locked = true })
 
 
-    --------------------------------
-    ---- WINDOWS AND WORKSPACES ----
-    --------------------------------
+--------------------------------
+---- WINDOWS AND WORKSPACES ----
+--------------------------------
 
-    -- Noctalia settings window floats instead of tiling
-    hl.window_rule({
-        match = { class = "dev.noctalia.Noctalia" },
-        float = true,
-        size  = { 1080, 920 },
-    })
+-- Noctalia settings window floats instead of tiling
+hl.window_rule({
+    match = { class = "dev.noctalia.Noctalia" },
+    float = true,
+    size  = { 1080, 920 },
+})
 
-    -- Blur for Noctalia's bar, panels, dock and notifications
-    hl.layer_rule({
-        name  = "noctalia",
-        match = { namespace = "^noctalia-(bar-.+|notification|dock|panel|attached-panel|osd|window-switcher)$" },
-                  no_anim      = true,
-                  ignore_alpha = 0.5,
-                  blur         = true,
-                  blur_popups  = true,
-    })
+-- Blur for Noctalia's bar, panels, dock and notifications
+hl.layer_rule({
+    name  = "noctalia",
+    match = { namespace = "^noctalia-(bar-.+|notification|dock|panel|attached-panel|osd|window-switcher)$" },
+                no_anim      = true,
+                ignore_alpha = 0.5,
+                blur         = true,
+                blur_popups  = true,
+})
 
-    hl.window_rule({
-        -- Ignore maximize requests from all apps.
-        name  = "suppress-maximize-events",
-        match = { class = ".*" },
+hl.window_rule({
+    -- Ignore maximize requests from all apps.
+    name  = "suppress-maximize-events",
+    match = { class = ".*" },
 
-        suppress_event = "maximize",
-    })
+    suppress_event = "maximize",
+})
 
-    hl.window_rule({
-        -- Fix some dragging issues with XWayland
-        name  = "fix-xwayland-drags",
-        match = {
-            class      = "^$",
-            title      = "^$",
-            xwayland   = true,
-            float      = true,
-            fullscreen = false,
-            pin        = false,
-        },
+hl.window_rule({
+    -- Fix some dragging issues with XWayland
+    name  = "fix-xwayland-drags",
+    match = {
+        class      = "^$",
+        title      = "^$",
+        xwayland   = true,
+        float      = true,
+        fullscreen = false,
+        pin        = false,
+    },
 
-        no_focus = true,
-    })
+    no_focus = true,
+})
 
-    hl.window_rule({
-        name  = "move-hyprland-run",
-        match = { class = "hyprland-run" },
+hl.window_rule({
+    name  = "move-hyprland-run",
+    match = { class = "hyprland-run" },
 
-        move  = "20 monitor_h-120",
-        float = true,
-    })
+    move  = "20 monitor_h-120",
+    float = true,
+})
+
+hl.window_rule({
+    name  = "pip",
+    match = { title = "Picture-in-Picture" },
+    float = true,
+    pin   = true,
+})

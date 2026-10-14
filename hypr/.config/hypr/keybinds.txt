@@ -1,0 +1,46 @@
+HYPRLAND KEYBINDS            (q = close, arrows = scroll)
+  ============================================================
+
+  APPS
+    Super + Q              terminal (kitty)
+    Super + E              file manager (dolphin)
+    Super + F12            dropdown terminal
+    Super + Space          launcher (Noctalia)
+    Super + S              control center
+    Super + ,              Noctalia settings
+    Alt + Tab              window switcher
+    Super + F1             this cheat sheet
+
+  WINDOWS
+    Super + C              close window
+    Super + F              fullscreen
+    Super + V              toggle floating
+    Super + P              pseudo-tile
+    Super + J              toggle split direction
+    Super + Arrows         move focus
+    Super + Shift + Arrows move window
+    Super + R              resize mode (arrows resize,
+                           Esc or Return to exit)
+    Super + Left drag      move window (mouse)
+    Super + Right drag     resize window (mouse)
+
+  WORKSPACES
+    Super + 1..0           go to workspace 1..10
+    Super + Shift + 1..0   send window to workspace 1..10
+    Super + Scroll         cycle workspaces
+    Super + D              jump to an empty workspace
+    Super + Shift + D      back to previous workspace
+    3-finger swipe         switch workspace (touchpad)
+
+  SCREENSHOTS
+    Print                  region
+    Shift + Print          full screen
+    Super + Shift + S      region
+    Super + Shift + F      full screen
+
+  SESSION
+    Super + M              exit Hyprland
+
+  MEDIA KEYS
+    Volume / mute / mic mute / brightness
+    Play-pause / next / previous (playerctl)
