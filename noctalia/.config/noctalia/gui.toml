@@ -1,0 +1,181 @@
+config_version = 14
+
+[bar]
+order = [ "default", "test" ]
+
+    [bar.default]
+    end = [
+        "monitor",
+        "tray",
+        "notifications",
+        "clipboard",
+        "network",
+        "bluetooth",
+        "volume",
+        "brightness",
+        "battery",
+        "control-center",
+        "session"
+    ]
+    start = [ "launcher", "wallpaper", "workspaces", "hypr-submap", "audio_visualizer", "media" ]
+
+    [bar.test]
+    auto_hide = true
+    center = [ "bar", "widget", "bar_2", "wallhaven", "widget_2" ]
+    enabled = true
+    end = []
+    font_scale = 0.79999998956918716
+    margin_ends = 300
+    position = "left"
+    reserve_space = false
+    show_on_workspace_switch = false
+    start = []
+    thickness = 100
+    widget_spacing = 10
+
+[dock]
+enabled = true
+launcher_position = "start"
+reserve_space = false
+show_dots = true
+smart_auto_hide = true
+
+[hot_corners]
+enabled = true
+
+    [hot_corners.top_left]
+    action = "window_switcher"
+
+[location]
+auto_locate = true
+
+[lockscreen_widgets]
+enabled = false
+schema_version = 2
+widget_order = [ "lockscreen-login-box@eDP-1" ]
+
+    [lockscreen_widgets.grid]
+    cell_size = 16
+    major_interval = 4
+    visible = true
+
+    [lockscreen_widgets.widget."lockscreen-login-box@eDP-1"]
+    box_height = 196.0
+    box_width = 810.0
+    cx = 960.0
+    cy = 807.0
+    output = "eDP-1"
+    placement_height = 1080.0
+    placement_width = 1920.0
+    rotation = 0.0
+    type = "login_box"
+
+        [lockscreen_widgets.widget."lockscreen-login-box@eDP-1".settings]
+        background_color = "surface_variant"
+        background_opacity = 0.88
+        background_radius = 12.0
+        center_password_text = false
+        input_opacity = 1.0
+        input_radius = 6.0
+        layout = "regular"
+        show_caps_lock = true
+        show_keyboard_layout = true
+        show_login_button = true
+        show_media = true
+        show_session_buttons = true
+        show_unlock_hint = true
+        show_weather = true
+
+[plugin_settings."noctalia/wallhaven"]
+api_key = "yBwJ5gshkb3oQF9oIamqPO9SAwKASDjP"
+download_dir = "/home/sarxzer/Pictures/Wallpapers"
+
+[plugin_settings."yuuto/arch-updater"]
+aur_helper = "yay"
+
+[plugins]
+enabled = [
+    "dunarand/bookmarks",
+    "blackbartblues/keymap",
+    "k4n4t4/hypr-submap",
+    "icefish/phone-connect",
+    "yocraft/qrcode",
+    "yuuto/arch-updater",
+    "nomadcxx/gamer-mode",
+    "noctalia/wallhaven"
+]
+
+[shell]
+font_family = "MesloLGM Nerd Font"
+telemetry_enabled = true
+
+    [shell.panel]
+    clipboard_position = "auto"
+    launcher_placement = "attached"
+    open_near_click_clipboard = true
+    open_near_click_control_center = true
+    transparency_mode = "glass"
+
+    [shell.screen_corners]
+    size = 100
+
+    [shell.screenshot]
+    directory = "/home/sarxzer/Pictures/Screenshots"
+
+[theme]
+builtin = "Ayu"
+community_palette = "ADW"
+custom_palette = "VoidViolet"
+mode = "dark"
+source = "custom"
+
+[wallpaper]
+directory = "/home/sarxzer/Pictures"
+
+    [wallpaper.default]
+    path = "/home/sarxzer/Pictures/Wallpapers/No Logo Neb 289.png"
+
+    [wallpaper.last]
+    path = "/home/sarxzer/Pictures/Wallpapers/No Logo Neb 289.png"
+
+    [wallpaper.monitors.eDP-1]
+    path = "/home/sarxzer/Pictures/Wallpapers/No Logo Neb 289.png"
+
+    [[wallpaper.favorite]]
+    custom_palette = "VoidViolet"
+    palette_source = "custom"
+    path = "/home/sarxzer/Pictures/No Logo Neb 289.png"
+    theme_mode = "dark"
+
+    [[wallpaper.favorite]]
+    custom_palette = "VoidViolet"
+    palette_source = "custom"
+    path = "/home/sarxzer/Pictures/Wallpapers/No Logo Neb 289.png"
+    theme_mode = "dark"
+
+[widget.bar]
+type = "icefish/phone-connect:bar"
+
+[widget.bar_2]
+type = "dunarand/bookmarks:bar"
+
+[widget.hypr-submap]
+hide_when_default = true
+type = "k4n4t4/hypr-submap:hypr-submap"
+
+[widget.media]
+hide_when_no_media = true
+rotate_album_art = true
+
+[widget.monitor]
+show_net = false
+type = "nomadcxx/gamer-mode:monitor"
+
+[widget.wallhaven]
+type = "noctalia/wallhaven:wallhaven"
+
+[widget.widget]
+type = "yocraft/qrcode:widget"
+
+[widget.widget_2]
+type = "yuuto/arch-updater:widget"
