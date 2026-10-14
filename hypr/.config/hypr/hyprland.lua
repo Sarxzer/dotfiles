@@ -6,6 +6,12 @@
 -- Refer to the wiki for more information.
 -- https://wiki.hypr.land/Configuring/Start/
 
+local L = { kb_layout = "us", kb_variant = "" }  -- defaults (laptop)
+pcall(function()
+local over = dofile(os.getenv("HOME") .. "/.config/hypr/local.lua")
+for k, v in pairs(over) do L[k] = v end
+    end)
+
 
 ------------------
 ---- MONITORS ----
@@ -14,6 +20,13 @@
 -- See https://wiki.hypr.land/Configuring/Basics/Monitors/
 hl.monitor({
     output   = "eDP-1",
+    mode     = "preferred",
+    position = "auto",
+    scale    = "1",
+})
+
+hl.monitor({
+    output   = "HDMI-A-1",
     mode     = "preferred",
     position = "auto",
     scale    = "1",
@@ -165,8 +178,8 @@ hl.config({
 hl.config({
     input = {
         -- Change to "fr" if your keyboard is AZERTY
-        kb_layout  = "fr",
-        kb_variant = "us",
+        kb_layout  = L.kb_layout,
+        kb_variant = L.kb_variant,
         kb_model   = "",
         kb_options = "compose:rctrl",
         kb_rules   = "",
