@@ -138,6 +138,8 @@ alias lt='eza --icons --tree --level=2'
 alias cat='bat --paging=never'
 alias sshk='kitten ssh'
 
+alias clr='clear'
+
 alias vim='nvim'
 
 eval "$(navi widget zsh)"
