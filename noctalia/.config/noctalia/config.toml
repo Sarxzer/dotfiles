@@ -1,0 +1,4 @@
+[theme.templates.user.ratune]
+input_path  = "$XDG_CONFIG_HOME/noctalia/templates/ratune/ratune.toml"
+output_path = "$XDG_CONFIG_HOME/ratune/theme.generated.toml"
+post_hook   = "$XDG_CONFIG_HOME/noctalia/templates/ratune/apply.sh"
