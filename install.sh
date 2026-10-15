@@ -20,7 +20,7 @@ ZSH_CUSTOM_DIR="${ZSH_CUSTOM:-$ZSH_DIR/custom}"
 
 # Folders in this repo that get stowed into $HOME. Missing ones are skipped,
 # so you can add "nvim" (or anything else) to the repo later without editing this.
-PACKAGES=(zsh kitty hypr noctalia applications nvim)
+PACKAGES=(zsh kitty hypr noctalia applications nvim qt6ct)
 
 # Everything the configs rely on. Installed through yay/paru so repo and AUR
 # packages are handled the same way.
