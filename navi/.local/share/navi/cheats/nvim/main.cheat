@@ -1,0 +1,695 @@
+# ============================== NEO-TREE ==============================
+
+% nvim, neo-tree, files
+# Toggle Neo-tree
+echo "<C-n>"
+
+% nvim, neo-tree, files
+# Open Neo-tree
+echo ":Neotree"
+
+% nvim, neo-tree, files
+# Create a file
+echo "a"
+
+% nvim, neo-tree, files
+# Create a directory
+echo "A"
+
+% nvim, neo-tree, files
+# Delete selected file/directory
+echo "d"
+
+% nvim, neo-tree, files
+# Rename selected file/directory
+echo "r"
+
+% nvim, neo-tree, files
+# Copy selected file/directory
+echo "c"
+
+% nvim, neo-tree, files
+# Move selected file/directory
+echo "m"
+
+% nvim, neo-tree, files
+# Paste
+echo "p"
+
+% nvim, neo-tree, files
+# Cut selected file/directory
+echo "x"
+
+% nvim, neo-tree, files
+# Copy path to clipboard
+echo "y"
+
+% nvim, neo-tree, files
+# Toggle hidden files
+echo "H"
+
+% nvim, neo-tree, files
+# Show Neo-tree help
+echo "?"
+
+% nvim, neo-tree, files
+# Close Neo-tree
+echo "q"
+
+
+# ============================== TELESCOPE ==============================
+
+% nvim, telescope, search
+# Find files
+echo "<C-p>"
+
+% nvim, telescope, search
+# Search text across the project
+echo "<C-f>"
+
+% nvim, telescope, search
+# Find open buffers
+echo "<leader>fb"
+
+% nvim, telescope, search
+# Find help tags
+echo "<leader>fh"
+
+% nvim, telescope, search
+# Find recently opened files
+echo "<leader>fr"
+
+% nvim, telescope, search
+# Find commands
+echo ":Telescope commands"
+
+% nvim, telescope, search
+# Find keymaps
+echo ":Telescope keymaps"
+
+% nvim, telescope, search
+# Search word under cursor
+echo ":Telescope grep_string"
+
+
+# ============================== LUALINE ==============================
+
+% nvim, lualine, ui
+# Open Lualine help
+echo ":help lualine"
+
+
+# ============================== GITSIGNS ==============================
+
+% nvim, gitsigns, git
+# Go to next Git hunk
+echo "]c"
+
+% nvim, gitsigns, git
+# Go to previous Git hunk
+echo "[c"
+
+% nvim, gitsigns, git
+# Preview current hunk
+echo "<leader>hp"
+
+% nvim, gitsigns, git
+# Stage current hunk
+echo "<leader>hs"
+
+% nvim, gitsigns, git
+# Reset current hunk
+echo "<leader>hr"
+
+% nvim, gitsigns, git
+# Stage entire buffer
+echo "<leader>hS"
+
+% nvim, gitsigns, git
+# Undo stage of current hunk
+echo "<leader>hu"
+
+% nvim, gitsigns, git
+# Show full blame for current line
+echo "<leader>hb"
+
+% nvim, gitsigns, git
+# Toggle current-line Git blame
+echo "<leader>tb"
+
+% nvim, gitsigns, git
+# Show Git diff for current file
+echo "<leader>hd"
+
+
+# ============================== BLINK.CMP ==============================
+
+% nvim, blink, completion
+# Open completion menu
+echo "Ctrl+Space"
+
+% nvim, blink, completion
+# Select next completion
+echo "Ctrl+N"
+
+% nvim, blink, completion
+# Select previous completion
+echo "Ctrl+P"
+
+% nvim, blink, completion
+# Accept selected completion
+echo "Ctrl+Y"
+
+% nvim, blink, completion
+# Hide completion menu
+echo "Ctrl+E"
+
+% nvim, blink, completion
+# Scroll completion documentation up
+echo "Ctrl+B"
+
+% nvim, blink, completion
+# Scroll completion documentation down
+echo "Ctrl+F"
+
+% nvim, blink, completion
+# Toggle signature help
+echo "Ctrl+K"
+
+% nvim, blink, completion
+# Move to next snippet placeholder
+echo "Tab"
+
+% nvim, blink, completion
+# Move to previous snippet placeholder
+echo "Shift+Tab"
+
+
+# ============================== LAZY.NVIM ==============================
+
+% nvim, lazy, plugins
+# Open Lazy plugin manager
+echo ":Lazy"
+
+% nvim, lazy, plugins
+# Update plugins
+echo ":Lazy update"
+
+% nvim, lazy, plugins
+# Install missing plugins
+echo ":Lazy install"
+
+% nvim, lazy, plugins
+# Clean unused plugins
+echo ":Lazy clean"
+
+% nvim, lazy, plugins
+# Check plugin status
+echo ":Lazy check"
+
+
+# ============================== TOKYO NIGHT ==============================
+
+% nvim, theme, colors
+# Tokyo Night
+echo ":colorscheme tokyonight-night"
+
+% nvim, theme, colors
+# Tokyo Night Storm
+echo ":colorscheme tokyonight-storm"
+
+% nvim, theme, colors
+# Tokyo Night Moon
+echo ":colorscheme tokyonight-moon"
+
+% nvim, theme, colors
+# Tokyo Night Day
+echo ":colorscheme tokyonight-day"
+
+
+# ============================== FILES, SAVE & QUIT ==============================
+
+% nvim, core, files
+# Save file
+echo ':w'
+
+% nvim, core, files
+# Save and quit
+echo ':wq  (or ZZ)'
+
+% nvim, core, files
+# Quit without saving
+echo ':q!  (or ZQ)'
+
+% nvim, core, files
+# Quit all windows
+echo ':qa'
+
+% nvim, core, files
+# Save all and quit
+echo ':wqa'
+
+% nvim, core, files
+# Save as another name
+echo ':saveas newname.py'
+
+% nvim, core, files
+# Reload file from disk (discard changes)
+echo ':e!'
+
+% nvim, core, files
+# Open a file
+echo ':e path/to/file'
+
+% nvim, core, files
+# Show current file path
+echo ':echo expand("%:p")'
+
+% nvim, core, files
+# Save a file you forgot sudo for
+echo ':w !sudo tee % > /dev/null'
+
+
+# ============================== MOVEMENT ==============================
+
+% nvim, core, movement
+# Next word / previous word / end of word
+echo 'w / b / e'
+
+% nvim, core, movement
+# Start / first non-blank / end of line
+echo '0 / ^ / $'
+
+% nvim, core, movement
+# Top / bottom of file
+echo 'gg / G'
+
+% nvim, core, movement
+# Go to line 42
+echo ':42  (or 42G)'
+
+% nvim, core, movement
+# Jump to matching bracket
+echo '%'
+
+% nvim, core, movement
+# Next / previous paragraph
+echo '} / {'
+
+% nvim, core, movement
+# Half-page down / up
+echo 'Ctrl+d / Ctrl+u'
+
+% nvim, core, movement
+# Full page down / up
+echo 'Ctrl+f / Ctrl+b'
+
+% nvim, core, movement
+# Center screen on cursor
+echo 'zz'
+
+% nvim, core, movement
+# Jump to character on line (forward / backward)
+echo 'f<char> / F<char>'
+
+% nvim, core, movement
+# Jump back / forward in jump list
+echo 'Ctrl+o / Ctrl+i'
+
+% nvim, core, movement
+# Jump to last edit position
+echo "g;"
+
+% nvim, core, movement
+# Jump to top / middle / bottom of screen
+echo 'H / M / L'
+
+
+# ============================== EDITING ==============================
+
+% nvim, core, editing
+# Enter insert mode (before / after / line start / line end)
+echo 'i / a / I / A'
+
+% nvim, core, editing
+# New line below / above
+echo 'o / O'
+
+% nvim, core, editing
+# Delete word / to end of line / whole line
+echo 'dw / D / dd'
+
+% nvim, core, editing
+# Delete N lines
+echo '10dd'
+
+% nvim, core, editing
+# Delete to end of file / to top of file
+echo 'dG / dgg'
+
+% nvim, core, editing
+# Delete inside quotes / parentheses / brackets
+echo 'di" / di( / di['
+
+% nvim, core, editing
+# Change inside quotes (delete and enter insert mode)
+echo 'ci"'
+
+% nvim, core, editing
+# Change word / change to end of line
+echo 'cw / C'
+
+% nvim, core, editing
+# Replace single character
+echo 'r<char>'
+
+% nvim, core, editing
+# Delete character under cursor
+echo 'x'
+
+% nvim, core, editing
+# Yank (copy) line / word / to end of line
+echo 'yy / yw / y$'
+
+% nvim, core, editing
+# Paste after / before cursor
+echo 'p / P'
+
+% nvim, core, editing
+# Undo / redo
+echo 'u / Ctrl+r'
+
+% nvim, core, editing
+# Repeat last change
+echo '.'
+
+% nvim, core, editing
+# Join line below onto current
+echo 'J'
+
+% nvim, core, editing
+# Indent / unindent line
+echo '>> / <<'
+
+% nvim, core, editing
+# Toggle case of character / lowercase line / uppercase line
+echo '~ / guu / gUU'
+
+% nvim, core, editing
+# Increment / decrement number under cursor
+echo 'Ctrl+a / Ctrl+x'
+
+% nvim, core, editing
+# Reindent the whole file
+echo 'gg=G'
+
+% nvim, core, editing
+# Wipe the entire file
+echo ':%d'
+
+% nvim, core, editing
+# Delete previous word in insert mode
+echo 'Ctrl+w'
+
+% nvim, core, editing
+# Run one normal command from insert mode
+echo 'Ctrl+o'
+
+
+# ============================== VISUAL MODE ==============================
+
+% nvim, core, visual
+# Visual (char) / visual line / visual block
+echo 'v / V / Ctrl+v'
+
+% nvim, core, visual
+# Select the whole file
+echo 'ggVG'
+
+% nvim, core, visual
+# Reselect last visual selection
+echo 'gv'
+
+% nvim, core, visual
+# Select inside quotes / parentheses
+echo 'vi" / vi('
+
+% nvim, core, visual
+# Insert at start of every selected line (block mode)
+echo 'Ctrl+v, select lines, I, type text, Esc'
+
+% nvim, core, visual
+# Append at end of every selected line (block mode)
+echo 'Ctrl+v, select lines, $, A, type text, Esc'
+
+
+# ============================== SEARCH & REPLACE ==============================
+
+% nvim, core, search
+# Search forward / backward
+echo '/pattern  |  ?pattern'
+
+% nvim, core, search
+# Next / previous match
+echo 'n / N'
+
+% nvim, core, search
+# Search word under cursor forward / backward
+echo '* / #'
+
+% nvim, core, search
+# Clear search highlight
+echo ':noh'
+
+% nvim, core, search
+# Replace in current line
+echo ':s/old/new/g'
+
+% nvim, core, search
+# Replace in whole file
+echo ':%s/old/new/g'
+
+% nvim, core, search
+# Replace in whole file with confirmation
+echo ':%s/old/new/gc'
+
+% nvim, core, search
+# Replace in selection
+echo ":'<,'>s/old/new/g"
+
+% nvim, core, search
+# Run a command on all lines matching a pattern
+echo ':g/pattern/d   (delete all matching lines)'
+
+% nvim, core, search
+# Delete all lines NOT matching a pattern
+echo ':v/pattern/d'
+
+% nvim, core, search
+# Delete all empty lines
+echo ':g/^$/d'
+
+% nvim, core, search
+# Remove trailing whitespace
+echo ':%s/\s\+$//e'
+
+
+# ============================== WINDOWS ==============================
+
+% nvim, core, windows
+# Horizontal split / vertical split
+echo ':split / :vsplit'
+
+% nvim, core, windows
+# Move between windows
+echo 'Ctrl+w h/j/k/l'
+
+% nvim, core, windows
+# Close current window
+echo ':close  (or Ctrl+w c)'
+
+% nvim, core, windows
+# Keep only current window
+echo ':only  (or Ctrl+w o)'
+
+% nvim, core, windows
+# Equalize window sizes
+echo 'Ctrl+w ='
+
+% nvim, core, windows
+# Swap / rotate windows
+echo 'Ctrl+w x / Ctrl+w r'
+
+
+# ============================== BUFFERS & TABS ==============================
+
+% nvim, core, buffers
+# List buffers
+echo ':ls'
+
+% nvim, core, buffers
+# Next / previous buffer
+echo ':bnext / :bprev'
+
+% nvim, core, buffers
+# Switch to alternate (last) buffer
+echo 'Ctrl+^'
+
+% nvim, core, buffers
+# Close current buffer
+echo ':bd'
+
+% nvim, core, tabs
+# New tab / close tab
+echo ':tabnew / :tabclose'
+
+% nvim, core, tabs
+# Next / previous tab
+echo 'gt / gT'
+
+
+# ============================== REGISTERS, MARKS & MACROS ==============================
+
+% nvim, core, registers
+# View all registers
+echo ':reg'
+
+% nvim, core, registers
+# Yank to / paste from system clipboard
+echo '"+y / "+p'
+
+% nvim, core, registers
+# Delete without overwriting your yank (black hole register)
+echo '"_dd'
+
+% nvim, core, marks
+# Set mark a / jump to mark a
+echo "ma / 'a"
+
+% nvim, core, marks
+# Jump back to where you were before the last jump
+echo "''"
+
+% nvim, core, macros
+# Record macro into register q (press q again to stop)
+echo 'qq ... q'
+
+% nvim, core, macros
+# Play macro q / replay last macro
+echo '@q / @@'
+
+% nvim, core, macros
+# Play macro 20 times
+echo '20@q'
+
+
+# ============================== FOLDS ==============================
+
+% nvim, core, folds
+# Toggle fold / close fold / open fold
+echo 'za / zc / zo'
+
+% nvim, core, folds
+# Close all folds / open all folds
+echo 'zM / zR'
+
+
+# ============================== TERMINAL & SHELL ==============================
+
+% nvim, core, terminal
+# Run current file with Python
+echo ':w | !python3 %'
+
+% nvim, core, terminal
+# Run current file in a terminal split
+echo ':split | term python3 %'
+
+% nvim, core, terminal
+# Open a terminal buffer
+echo ':term'
+
+% nvim, core, terminal
+# Leave terminal mode (back to normal mode)
+echo 'Ctrl+\ Ctrl+n'
+
+% nvim, core, terminal
+# Run any shell command
+echo ':!ls -la'
+
+% nvim, core, terminal
+# Insert shell command output into the buffer
+echo ':r !date'
+
+
+# ============================== LSP (DEFAULTS, NVIM 0.10+) ==============================
+
+% nvim, lsp, code
+# Go to definition
+echo 'gd  (or Ctrl+])'
+
+% nvim, lsp, code
+# Show hover documentation
+echo 'K'
+
+% nvim, lsp, code
+# Rename symbol
+echo 'grn'
+
+% nvim, lsp, code
+# Code actions
+echo 'gra'
+
+% nvim, lsp, code
+# List references
+echo 'grr'
+
+% nvim, lsp, code
+# Go to implementation
+echo 'gri'
+
+% nvim, lsp, code
+# Show signature help (insert mode)
+echo 'Ctrl+s'
+
+% nvim, lsp, code
+# Next / previous diagnostic
+echo ']d / [d'
+
+% nvim, lsp, code
+# Show diagnostic under cursor
+echo 'Ctrl+w d'
+
+% nvim, lsp, code
+# Show attached LSP clients
+echo ':checkhealth vim.lsp'
+
+
+# ============================== HELP & DEBUG ==============================
+
+% nvim, core, help
+# Search help
+echo ':help <topic>'
+
+% nvim, core, help
+# Check Neovim health
+echo ':checkhealth'
+
+% nvim, core, help
+# Show recent messages
+echo ':messages'
+
+% nvim, core, help
+# Show what a key is mapped to
+echo ':verbose map <key>'
+
+% nvim, core, help
+# Toggle line numbers / relative numbers
+echo ':set number! / :set relativenumber!'
+
+% nvim, core, help
+# Toggle line wrap
+echo ':set wrap!'
+
+% nvim, core, help
+# Show where your config lives
+echo ':echo stdpath("config")'

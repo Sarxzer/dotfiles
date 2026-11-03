@@ -1,0 +1,216 @@
+; Wi-Fi / network cheatsheet — covers both NetworkManager (nmcli) and iwd (iwctl),
+; since which one's actually running varies by install. Generic ip/dns/troubleshooting
+; entries work regardless of which stack you're on.
+; Shared variable generators are in the "% var-*" blocks; real entries pull them in with "@".
+
+# ============================ SHARED VARIABLES ===============================
+
+% var-iface
+
+$ IFACE: ip -o link show | awk -F': ' '{print $2}' | grep -v '^lo$' --- --header "Network interfaces"
+
+% var-nmconn
+
+$ CONN: nmcli -t -f NAME connection show 2>/dev/null --- --header "Saved NetworkManager connections"
+
+% var-nmssid
+
+$ SSID: nmcli -t -f SSID dev wifi list 2>/dev/null | sort -u | grep -v '^$' --- --header "Visible Wi-Fi networks"
+
+# ================================ DISCOVER ===================================
+
+% discover, network
+# All interfaces and their addresses
+ip addr show
+
+% discover, network
+@ var-iface
+# Address info for one interface
+ip addr show "<IFACE>"
+
+% discover, network
+# Current routing table
+ip route show
+
+% discover, network
+# NetworkManager's view of every device
+nmcli device status
+
+% discover, network
+# NetworkManager's view of every saved connection
+nmcli connection show
+
+% discover, network
+# Hardware/software radio kill-switch states (Wi-Fi, Bluetooth, etc.)
+rfkill list
+
+# ============================== WIFI (NetworkManager) ==========================
+
+% wifi, network
+@ var-nmssid
+# Connect to a Wi-Fi network by SSID
+nmcli dev wifi connect "<SSID>" password "<PASSWORD>"
+
+% wifi, network
+# List visible Wi-Fi networks with signal strength/security
+nmcli dev wifi list
+
+% wifi, network
+@ var-iface
+# Force a fresh Wi-Fi scan on one interface
+nmcli dev wifi rescan ifname "<IFACE>"
+
+% wifi, network
+@ var-nmconn
+# Bring up a saved connection
+nmcli connection up "<CONN>"
+
+% wifi, network
+@ var-nmconn
+# Bring down a saved connection
+nmcli connection down "<CONN>"
+
+% wifi, network, destructive
+@ var-nmconn
+# Permanently delete a saved connection profile
+nmcli connection delete "<CONN>"
+
+% wifi, network
+@ var-nmconn
+# Reveal the saved Wi-Fi password for a connection
+nmcli --show-secrets connection show "<CONN>" | grep -i psk
+
+% wifi, network
+# Turn the Wi-Fi radio on or off entirely
+nmcli radio wifi "<STATE>"
+
+$ STATE: printf '%s\n' on off --- --header "Enable/disable the Wi-Fi radio"
+
+# ================================ WIFI (iwd) ==================================
+
+% wifi, network
+@ var-iface
+# Trigger a Wi-Fi scan on one interface
+iwctl station "<IFACE>" scan
+
+% wifi, network
+@ var-iface
+# List networks found by the last scan
+iwctl station "<IFACE>" get-networks
+
+% wifi, network
+@ var-iface
+# Connect to a network by SSID (prompts for passphrase if needed)
+iwctl station "<IFACE>" connect "<SSID>"
+
+$ SSID: echo "type the SSID shown by get-networks"
+
+% wifi, network
+@ var-iface
+# Disconnect the current Wi-Fi connection
+iwctl station "<IFACE>" disconnect
+
+% wifi, network
+# List networks iwd has saved credentials for
+iwctl known-networks list
+
+% wifi, network, destructive
+# Forget a saved network's credentials
+iwctl known-networks "<SSID>" forget
+
+$ SSID: echo "type the SSID to forget"
+
+# ================================== DNS ======================================
+
+% dns, network
+# systemd-resolved's current status per interface
+resolvectl status
+
+% dns, network
+@ var-iface
+# DNS servers configured for one interface
+resolvectl dns "<IFACE>"
+
+% dns, network
+# Clear the local DNS resolver cache
+resolvectl flush-caches
+
+% dns, network, troubleshooting
+# Full DNS lookup for a domain
+dig "<DOMAIN>"
+
+$ DOMAIN: echo example.com
+
+% dns, network, troubleshooting
+# Just the resolved IP, no extra output
+dig +short "<DOMAIN>"
+
+$ DOMAIN: echo example.com
+
+# ============================== TROUBLESHOOTING ================================
+
+% troubleshooting, network
+# Basic reachability check
+ping -c 4 "<HOST>"
+
+$ HOST: printf '%s\n' 1.1.1.1 8.8.8.8 archlinux.org --- --header "Common reachability targets"
+
+% troubleshooting, network
+# Live hop-by-hop packet loss/latency along the route
+mtr -rw "<HOST>"
+
+$ HOST: printf '%s\n' 1.1.1.1 8.8.8.8 archlinux.org --- --header "Common reachability targets"
+
+% troubleshooting, network
+# Every listening TCP/UDP socket with owning process
+sudo ss -tulnp
+
+% troubleshooting, network
+# Break down exactly where time goes in an HTTP request: DNS, connect, TLS, total
+curl -o /dev/null -s -w 'DNS: %{time_namelookup}s Connect: %{time_connect}s TLS: %{time_appconnect}s Total: %{time_total}s\n' "<URL>"
+
+$ URL: echo https://example.com
+
+% troubleshooting, network
+# NetworkManager's own logs for this boot
+journalctl -u NetworkManager -b --no-pager
+
+% troubleshooting, network
+# iwd's own logs for this boot
+journalctl -u iwd -b --no-pager
+
+% restart, network
+# Restart NetworkManager entirely
+sudo systemctl restart NetworkManager
+
+% restart, network
+@ var-iface
+# Cycle one interface down and back up
+sudo ip link set "<IFACE>" down && sudo ip link set "<IFACE>" up
+
+# ================================= SPEED =====================================
+
+% speed, network
+# Quick download speed test against Cloudflare
+curl -o /dev/null https://speed.cloudflare.com/__down?bytes=100000000
+
+# ================================ FIREWALL ===================================
+
+% firewall, network
+# Current nftables ruleset
+sudo nft list ruleset
+
+% firewall, network
+# Current iptables ruleset with packet counters
+sudo iptables -L -n -v
+
+% firewall, network
+# ufw status, verbose
+sudo ufw status verbose
+
+% firewall, network
+# Allow a port through ufw
+sudo ufw allow "<PORT>/<PROTO>"
+
+$ PORT: printf '%s\n' 22 80 443 8080 --- --header "Common ports"
+$ PROTO: printf '%s\n' tcp udp

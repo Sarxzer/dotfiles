@@ -1,0 +1,443 @@
+; Linux disk encryption / boot chain cheatsheet: LUKS2, TPM2, GRUB, Secure Boot, mkinitcpio, Btrfs
+; Portable: every device path is resolved live via lsblk/blkid/findmnt, nothing hardcoded.
+; Shared variable generators live in the "% var-*" blocks below and are pulled in with "@" —
+; edit a generator once, every entry using it updates. These var-* entries never show up
+; in navi's own search UI since they carry no direct executable command.
+
+# ============================ SHARED VARIABLES ===============================
+
+% var-luksdev
+
+$ LUKS_DEV: lsblk -rno PATH,FSTYPE | awk '$2=="crypto_LUKS"{print $1}' --- --header "LUKS containers found on this system"
+
+% var-partition
+
+$ PARTITION: lsblk -rno PATH | tail -n +1 --- --header "All partitions"
+
+% var-disk
+
+$ DISK: lsblk -rndo PATH,TYPE | awk '$2=="disk"{print $1}' --- --header "Whole disks (not partitions) — double-check before anything destructive"
+
+% var-mapper
+
+$ MAPPER_NAME: ls /dev/mapper | grep -v '^control$' --- --header "Currently open device-mapper names"
+
+% var-esp
+
+$ ESP_MOUNTPOINT: { findmnt -no TARGET /boot 2>/dev/null; findmnt -no TARGET /efi 2>/dev/null; } --- --header "Detected ESP-ish mountpoints — verify with 'discover' entries if empty"
+
+% var-preset
+
+$ KERNEL_PRESET: ls /etc/mkinitcpio.d/ 2>/dev/null | sed 's/\.preset$//' --- --header "Installed mkinitcpio presets"
+
+% var-pcrset
+
+$ PCR_SET: printf '%s\n' "0+7" "7" "0+2+7" "0+2+4+7" "7+11" --- --header "0=firmware 2=option-ROM 4=bootloader-code 7=SecureBoot-state 11=UKI/initrd"
+
+% var-grubcfg
+
+$ GRUB_CFG: find /boot/grub -maxdepth 1 -name grub.cfg 2>/dev/null --- --header "Generated grub.cfg location"
+
+% var-efibinary
+
+$ EFI_BINARY: find /boot -iname '*.efi' 2>/dev/null --- --header "Every EFI binary under /boot"
+
+% var-backup
+
+$ BACKUP_PATH: find "$HOME" -maxdepth 1 -name 'luks-header-backup-*.img' 2>/dev/null --- --header "Existing header backups in $HOME"
+
+# ============================== DISCOVERY ===================================
+
+% discover
+# Full block-device tree: names, sizes, types, filesystems, UUIDs, mountpoints
+lsblk -e7 -o NAME,PATH,TYPE,SIZE,FSTYPE,LABEL,UUID,PARTUUID,PARTTYPE,MOUNTPOINTS
+
+% discover
+# Confirm UEFI vs legacy BIOS boot
+test -d /sys/firmware/efi && echo "UEFI" || echo "Legacy BIOS"
+
+% discover, luks
+@ var-luksdev
+# List every LUKS container on the system
+sudo blkid -t TYPE=crypto_LUKS
+
+% discover, luks
+@ var-partition
+# Check whether a specific device is a LUKS container
+sudo cryptsetup isLuks "<PARTITION>" && echo "LUKS" || echo "not LUKS"
+
+% discover
+# Show what's backing / , /boot and /efi right now
+findmnt /; findmnt /boot; findmnt /efi 2>/dev/null
+
+% discover
+# Active device-mapper mappings (LUKS, LVM) as a tree
+sudo dmsetup ls --tree
+
+% discover, luks
+@ var-mapper
+# Live status of one open LUKS mapping
+sudo cryptsetup status "<MAPPER_NAME>"
+
+% discover
+# Full current kernel command line, one param per line
+tr ' ' '\n' < /proc/cmdline
+
+% discover
+# UEFI firmware boot entries and current boot order
+sudo efibootmgr -v
+
+% discover, tpm
+# Confirm a TPM device is present and what the kernel sees
+ls -l /dev/tpm* 2>/dev/null; dmesg | grep -iE 'tpm|trusted platform module'
+
+% discover, grub
+# Installed packages relevant to this whole stack
+pacman -Q cryptsetup systemd mkinitcpio grub efibootmgr btrfs-progs sbctl tpm2-tools tpm2-tss 2>/dev/null
+
+# ================================ LUKS =======================================
+
+% luks
+@ var-luksdev
+# Full LUKS header: version, cipher, keyslots, tokens
+sudo cryptsetup luksDump "<LUKS_DEV>"
+
+% luks
+@ var-luksdev
+# Print just the LUKS UUID
+sudo cryptsetup luksUUID "<LUKS_DEV>"
+
+% luks, destructive
+@ var-partition
+# Create a new LUKS2 container — WIPES the target partition
+sudo cryptsetup luksFormat --type luks2 "<PARTITION>"
+
+% luks
+@ var-luksdev
+@ var-mapper
+# Open a LUKS container and map it under /dev/mapper/<name>
+sudo cryptsetup open "<LUKS_DEV>" "<MAPPER_NAME>"
+
+% luks
+@ var-mapper
+# Close an open LUKS mapping
+sudo cryptsetup close "<MAPPER_NAME>"
+
+% luks, troubleshooting
+@ var-mapper
+# See what's still holding an open mapping busy before closing it
+sudo fuser -vm "/dev/mapper/<MAPPER_NAME>"; sudo lsof "/dev/mapper/<MAPPER_NAME>"
+
+% luks
+@ var-luksdev
+# Add a new passphrase to a free keyslot (prompts for an existing one first)
+sudo cryptsetup luksAddKey "<LUKS_DEV>"
+
+% luks
+@ var-luksdev
+# Change an existing passphrase
+sudo cryptsetup luksChangeKey "<LUKS_DEV>"
+
+% luks, destructive
+@ var-luksdev
+# Permanently remove one keyslot by number — irreversible, verify the slot first
+sudo cryptsetup luksKillSlot "<LUKS_DEV>" "<SLOT>"
+
+$ SLOT: sudo cryptsetup luksDump "$LUKS_DEV" 2>/dev/null | awk '/^  [0-9]+: /{print $1}' | tr -d ':' --- --header "Occupied keyslots on the selected device"
+
+% luks
+@ var-luksdev
+# List LUKS2 tokens (TPM2/FIDO2 enrollments show up here)
+sudo cryptsetup token list "<LUKS_DEV>"
+
+% luks, destructive
+@ var-luksdev
+# Remove a specific LUKS2 token by ID — list tokens first to confirm which
+sudo cryptsetup token remove "<LUKS_DEV>" --token-id "<TOKEN_ID>"
+
+$ TOKEN_ID: sudo cryptsetup token list "$LUKS_DEV" 2>/dev/null | grep -oE '^[0-9]+' --- --header "Token IDs on the selected device"
+
+% luks, recovery
+@ var-luksdev
+# Test a passphrase without opening the device — safe sanity check before rebooting
+sudo cryptsetup open --test-passphrase "<LUKS_DEV>"
+
+% luks
+@ var-luksdev
+@ var-backup
+# Back up the LUKS header + keyslot area — protect this file like the disk itself
+sudo cryptsetup luksHeaderBackup "<LUKS_DEV>" --header-backup-file "<BACKUP_PATH>"
+
+% luks, destructive, recovery
+@ var-luksdev
+@ var-backup
+# Restore a LUKS header from backup — replaces ALL current keyslots with the backup's
+sudo cryptsetup luksHeaderRestore "<LUKS_DEV>" --header-backup-file "<BACKUP_PATH>"
+
+% luks
+@ var-mapper
+# Grow an active mapping to match a resized underlying partition
+sudo cryptsetup resize "<MAPPER_NAME>"
+
+# =============================== TPM2 ========================================
+
+% tpm
+# Dump every PCR bank and value the TPM currently reports
+sudo tpm2_pcrread
+
+% tpm
+# Read only specific PCRs (0=firmware, 4=boot loader code, 7=Secure Boot state, 11=UKI/initrd)
+sudo tpm2_pcrread sha256:0,4,7,11
+
+% tpm
+@ var-luksdev
+# Existing systemd-cryptenroll tokens on a LUKS2 volume
+sudo systemd-cryptenroll "<LUKS_DEV>"
+
+% tpm
+@ var-luksdev
+@ var-pcrset
+# Enroll TPM2 auto-unlock bound to specific PCRs — does NOT touch GRUB or mkinitcpio by itself
+sudo systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs="<PCR_SET>" "<LUKS_DEV>"
+
+% tpm
+@ var-luksdev
+@ var-pcrset
+# Enroll TPM2 and additionally require a PIN typed at boot
+sudo systemd-cryptenroll --tpm2-device=auto --tpm2-with-pin=yes --tpm2-pcrs="<PCR_SET>" "<LUKS_DEV>"
+
+% tpm, recovery
+@ var-luksdev
+# Remove the TPM2 slot only — confirm a working password/recovery slot exists first
+sudo systemd-cryptenroll --wipe-slot=tpm2 "<LUKS_DEV>"
+
+% tpm, recovery
+@ var-luksdev
+@ var-pcrset
+# Full re-enrollment after any boot-chain change (kernel update, GRUB rebuild, Secure Boot toggle, firmware update)
+sudo systemd-cryptenroll --wipe-slot=tpm2 "<LUKS_DEV>" && sudo systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs="<PCR_SET>" "<LUKS_DEV>"
+
+% tpm, troubleshooting
+# TPM/cryptsetup-related kernel and boot log lines from this boot
+journalctl -b -k | grep -iE 'tpm|pcr'; journalctl -b -u 'systemd-cryptsetup*' --no-pager
+
+% tpm, troubleshooting
+# If a reboot suddenly asks for the password instead of auto-unlocking: PCR state changed since enrollment
+sudo tpm2_pcrread sha256:0,4,7,11
+
+% tpm, mkinitcpio
+@ var-luksdev
+# Kernel command-line syntax for sd-encrypt to consume a TPM2 enrollment automatically
+echo "rd.luks.name=$(sudo cryptsetup luksUUID "<LUKS_DEV>")=cryptroot root=/dev/mapper/cryptroot rd.luks.options=tpm2-device=auto"
+
+# ============================== SECURE BOOT ==================================
+; own-keys workflow via sbctl — no Microsoft shim in the boot chain
+
+% secureboot
+# Current Secure Boot / sbctl state: installed, setup mode, enabled, whose keys
+sudo sbctl status
+
+% secureboot
+# List every EFI binary sbctl knows about under /boot and whether it's signed
+sudo sbctl verify
+
+% secureboot
+@ var-efibinary
+# Sign one EFI binary with your enrolled keys
+sudo sbctl sign -s "<EFI_BINARY>"
+
+% secureboot
+# Generate your own Platform/KEK/db keys — firmware must be in Setup Mode first
+sudo sbctl create-keys
+
+% secureboot
+# Enroll your keys into firmware; -m also includes Microsoft certs for hardware/option-ROM compatibility
+sudo sbctl enroll-keys -m
+
+% secureboot, troubleshooting
+# "File is immutable" on enrollment: efivarfs marked the variable immutable, strip that first
+sudo chattr -i "<EFIVAR_PATH>"
+
+$ EFIVAR_PATH: find /sys/firmware/efi/efivars -maxdepth 1 \( -iname 'KEK-*' -o -iname 'db-*' -o -iname 'PK-*' \) --- --header "EFI variable files that may need chattr -i"
+
+% secureboot, grub
+@ var-esp
+# Install GRUB with shim_lock disabled AND every module it could need embedded at build time.
+# Both flags are required together and are NOT persistent — replay this exact command every grub-install.
+sudo grub-install --target=x86_64-efi --efi-directory="<ESP_MOUNTPOINT>" --bootloader-id=GRUB --modules="tpm cpuid part_gpt part_msdos fat ext2 btrfs normal configfile chain search search_fs_uuid search_label search_fs_file echo test true ls cat help minicmd reboot halt all_video video gfxterm gfxmenu gfxterm_background font gettext loadenv efifwsetup keystatus sleep regexp probe" --disable-shim-lock --recheck
+
+% secureboot, grub, troubleshooting
+@ var-esp
+# "grub rescue>" with "verification requested but nobody cares: .../<name>.mod" — that module wasn't embedded, add its exact name to --modules and reinstall
+sudo grub-install --target=x86_64-efi --efi-directory="<ESP_MOUNTPOINT>" --bootloader-id=GRUB --disable-shim-lock --recheck
+
+% secureboot, troubleshooting
+# `strings <binary> | grep shim_lock` is NOT a valid test — shim_lock is compiled into every core.img regardless of the flag, it just isn't registered as active verifier. The only real test is booting with Secure Boot on.
+sudo sbctl verify
+
+% secureboot, grub
+@ var-efibinary
+# Re-sign after any rebuild — the sbctl pacman hook auto-resigns on kernel updates but doesn't know about --modules/--disable-shim-lock, so a plain grub-install can silently regress a working setup while sbctl still reports it "signed"
+sudo sbctl sign -s "<EFI_BINARY>"
+
+% secureboot, tpm
+@ var-luksdev
+# After any Secure Boot state change (enabled/disabled, key re-enrollment), PCR 7 changes too — re-enroll TPM2 or you'll fall back to password prompts
+sudo systemd-cryptenroll --wipe-slot=tpm2 "<LUKS_DEV>" && sudo systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=0+7 "<LUKS_DEV>"
+
+# ================================ GRUB =======================================
+
+% grub
+# Check current defaults file
+sudo cat /etc/default/grub
+
+% grub
+@ var-grubcfg
+# Regenerate grub.cfg after any config, kernel, or snapshot change
+sudo grub-mkconfig -o "<GRUB_CFG>"
+
+% grub, luks
+@ var-grubcfg
+# Confirm root/crypt parameters actually made it into the generated config
+sudo grep -nE 'linux |crypt|rd\.luks|cryptdevice|root=|rootflags=' "<GRUB_CFG>"
+
+% grub
+@ var-esp
+# Standard UEFI install without Secure Boot module embedding — only if Secure Boot stays off for good, otherwise use the secureboot,grub entry above
+sudo grub-install --target=x86_64-efi --efi-directory="<ESP_MOUNTPOINT>" --bootloader-id=GRUB --recheck
+
+% grub, destructive
+@ var-disk
+# Legacy BIOS install — writes boot code to the whole disk, not a partition; double-check the target
+sudo grub-install --target=i386-pc "<DISK>"
+
+% grub, luks
+# Only needed if GRUB itself must unlock an encrypted /boot (unencrypted /boot + encrypted root doesn't need this). GRUB's LUKS2 support is PBKDF2 only, no Argon2.
+sudoedit /etc/default/grub
+
+% grub, verify
+@ var-partition
+# Custom chainload entry for another OS/rescue EFI binary on a separate partition — add to /etc/grub.d/40_custom, then grub-mkconfig
+cat <<'EOF'
+menuentry "Custom Rescue" {
+    insmod part_gpt
+    insmod fat
+    insmod chain
+    search --no-floppy --set=rescue_part --part-uuid <PARTUUID>
+    chainloader ($rescue_part)<EFI_PATH>
+}
+EOF
+
+$ PARTUUID: lsblk -rno PARTUUID,PATH | tail -n +1 --- --header "Partition UUIDs"
+$ EFI_PATH: echo "/EFI/Linux/rescue.efi"
+
+# ============================== MKINITCPIO ===================================
+
+% mkinitcpio
+# Current hook order and modules
+grep -E '^(MODULES|BINARIES|FILES|HOOKS)=' /etc/mkinitcpio.conf
+
+% mkinitcpio
+# Rebuild every installed kernel preset — do this after any hook/module/crypttab.initramfs change
+sudo mkinitcpio -P
+
+% mkinitcpio
+@ var-preset
+# Rebuild one specific preset only
+sudo mkinitcpio -p "<KERNEL_PRESET>"
+
+% mkinitcpio, luks
+# systemd-based hook order for TPM2/FIDO2-capable encrypted root: sd-encrypt after systemd, before filesystems
+echo 'HOOKS=(base systemd autodetect microcode modconf kms keyboard sd-vconsole block sd-encrypt filesystems fsck)'
+
+% mkinitcpio, luks
+# Traditional busybox hook order (cryptdevice= kernel param instead of rd.luks.*): encrypt after udev
+echo 'HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolefont block encrypt filesystems fsck)'
+
+% mkinitcpio, luks
+# LVM-on-LUKS: add lvm2 right after whichever encryption hook you use
+echo 'HOOKS=(base systemd autodetect microcode modconf kms keyboard sd-vconsole block sd-encrypt lvm2 filesystems fsck)'
+
+% mkinitcpio, verify
+# Confirm the built initramfs actually contains encryption/TPM support
+lsinitcpio "<INITRAMFS>" | grep -Ei 'crypt|systemd-cryptsetup|tpm|luks'
+
+$ INITRAMFS: find /boot -maxdepth 1 -iname 'initramfs*.img' 2>/dev/null --- --header "Built initramfs images"
+
+# ================================ BTRFS ======================================
+
+% var-btrfsmount
+
+$ MOUNTPOINT: findmnt -t btrfs -no TARGET --- --header "Mounted btrfs filesystems"
+
+% btrfs
+@ var-btrfsmount
+# Subvolume layout of a mounted filesystem
+sudo btrfs subvolume list -t "<MOUNTPOINT>"
+
+% btrfs
+@ var-btrfsmount
+# Usage/allocation summary
+sudo btrfs filesystem usage "<MOUNTPOINT>"
+
+% btrfs
+# Mount the true top-level subvolume (id 5) without disturbing the current root mount — useful for inspecting/repairing snapshots
+sudo mount -o subvolid=5 "<PARTITION>" "<SCRATCH_MOUNTPOINT>"
+
+$ PARTITION: findmnt -t btrfs -no SOURCE --- --header "Btrfs source devices"
+$ SCRATCH_MOUNTPOINT: echo /mnt/btrfs-top
+
+% btrfs, grub
+@ var-btrfsmount
+# List detected snapshots the grub-btrfs integration will expose in the boot menu
+sudo btrfs subvolume list -t "<MOUNTPOINT>" | grep -i snapshot
+
+% btrfs, grub
+# grub-btrfs regenerates its snapshot submenu automatically via this daemon — enable it so new snapshots show up without a manual grub-mkconfig
+sudo systemctl enable --now grub-btrfsd
+
+% btrfs, destructive
+# Delete a subvolume and everything in it — irreversible
+sudo btrfs subvolume delete "<SUBVOLUME_PATH>"
+
+$ SUBVOLUME_PATH: sudo btrfs subvolume list -t / 2>/dev/null | awk 'NR>1{print "/"$NF}' --- --header "Subvolumes under /"
+
+% btrfs, destructive, recovery
+# Filesystem repair — only after a proper diagnosis and with backups in hand
+sudo btrfs check --repair "<PARTITION>"
+
+$ PARTITION: findmnt -t btrfs -no SOURCE --- --header "Btrfs source devices"
+
+# ============================== VERIFY / RECOVERY ============================
+
+% verify, recovery
+@ var-luksdev
+@ var-grubcfg
+# Full pre-reboot sanity pass after any encryption/boot-chain change
+sudo cryptsetup luksUUID "<LUKS_DEV>" && sudo cryptsetup open --test-passphrase "<LUKS_DEV>" && sudo grep -nE 'root=|rootflags=|crypt' "<GRUB_CFG>"
+
+% verify, tpm
+# The only test that actually proves TPM2 auto-unlock works: reboot and confirm zero passphrase prompt
+sudo systemctl reboot
+
+% recovery
+@ var-luksdev
+# Boot from install media, open the LUKS root manually, and chroot in to fix a broken config
+sudo cryptsetup open "<LUKS_DEV>" cryptroot && sudo mount /dev/mapper/cryptroot "<MOUNTPOINT>" && sudo arch-chroot "<MOUNTPOINT>"
+
+$ MOUNTPOINT: echo /mnt
+
+# ============================ QUICK REFERENCE ================================
+
+% reference
+@ var-partition
+# LUKS UUID (the container) vs filesystem UUID (what's inside once unlocked) vs PARTUUID (the partition-table entry) — never assume they match
+sudo blkid "<PARTITION>"
+
+% reference
+# rd.luks.* kernel params belong to sd-encrypt (systemd initramfs). cryptdevice= belongs to the traditional encrypt hook. Never mix the two.
+cat /proc/cmdline
+
+% reference
+# GRUB unlocking /boot (cryptodisk) is a completely separate mechanism from the initramfs unlocking root — most setups only need the latter
+findmnt /boot

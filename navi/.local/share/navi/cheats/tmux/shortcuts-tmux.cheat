@@ -1,0 +1,126 @@
+; tmux keybindings (reference only — the "echo" entries just print the shortcut) and real
+; CLI session commands. NOTE: "Ctrl+B then G" is kept from the original file but its label/binding
+; didn't match any vanilla tmux default — flag this one for a manual check against your tmux.conf.
+
+# ============================ SHARED VARIABLES ============================
+
+% var-session
+
+$ SESSION: tmux ls -F '#S' 2>/dev/null --- --header "Active tmux sessions"
+
+
+# ============================== KEYBIND ==============================
+
+% tmux, keybind
+# UNVERIFIED — doesn't match a vanilla tmux default, check against your tmux.conf
+echo "Ctrl+B then G"
+
+
+% tmux, keybind
+# New window
+echo "Ctrl+B then C"
+
+
+% tmux, keybind
+# Close window/pane
+echo "Ctrl+B then X"
+
+
+% tmux, keybind
+# Next window
+echo "Ctrl+B then N"
+
+
+% tmux, keybind
+# Previous window
+echo "Ctrl+B then P"
+
+
+% tmux, keybind
+# Jump to window by number
+echo "Ctrl+B then <num 0-9>"
+
+
+% tmux, keybind
+# Rename window
+echo "Ctrl+B then ,"
+
+
+% tmux, keybind
+# List windows
+echo "Ctrl+B then W"
+
+
+% tmux, keybind
+# Split pane vertically
+echo "Ctrl+B then %"
+
+
+% tmux, keybind
+# Split pane horizontally
+echo "Ctrl+B then \""
+
+
+% tmux, keybind
+# Navigate panes
+echo "Ctrl+B then <arrow key>"
+
+
+% tmux, keybind
+# Zoom/unzoom the active pane
+echo "Ctrl+B then Z"
+
+
+% tmux, keybind
+# Detach from the session
+echo "Ctrl+B then D"
+
+
+% tmux, keybind
+# Enter copy mode (scroll back, select text)
+echo "Ctrl+B then ["
+
+
+% tmux, keybind
+# Paste the most recent copy-mode selection
+echo "Ctrl+B then ]"
+
+
+% tmux, keybind
+# Open the tmux command prompt
+echo "Ctrl+B then :"
+
+
+# ============================== SESSION ==============================
+
+% tmux, session
+# List all sessions
+tmux ls
+
+
+% tmux, session
+@ var-session
+# Attach to an existing session
+tmux attach -t "<SESSION>"
+
+
+% tmux, session
+# Create a new named session
+tmux new -s "<session_name>"
+
+
+% tmux, session
+@ var-session
+# Rename an existing session
+tmux rename-session -t "<SESSION>" "<new_name>"
+
+
+% tmux, session
+# Reload tmux config without restarting the server
+tmux source-file ~/.tmux.conf
+
+
+% tmux, session, destructive
+@ var-session
+# Kill a session
+tmux kill-session -t "<SESSION>"

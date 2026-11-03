@@ -1,0 +1,151 @@
+; SSH cheatsheet — connecting, keys, agent, tunnels, known_hosts, troubleshooting.
+; Shared variable generators are in the "% var-*" blocks; real entries pull them in with "@".
+
+# ============================ SHARED VARIABLES ===============================
+
+% var-sshhost
+
+$ HOST: awk '/^Host /{for(i=2;i<=NF;i++) if ($i != "*") print $i}' ~/.ssh/config 2>/dev/null | sort -u --- --header "Hosts defined in ~/.ssh/config"
+
+% var-keyfile
+
+$ KEYFILE: find ~/.ssh -maxdepth 1 -type f ! -name '*.pub' ! -name 'config' ! -name 'known_hosts*' ! -name 'authorized_keys' 2>/dev/null --- --header "Private key files in ~/.ssh"
+
+# ================================ CONNECT ====================================
+
+% connect, ssh
+@ var-sshhost
+# Connect using a host alias from ~/.ssh/config
+ssh "<HOST>"
+
+% connect, ssh
+# Connect directly by user and hostname/IP
+ssh "<USER>@<HOSTNAME>"
+
+% connect, ssh
+# Connect on a non-default port
+ssh -p "<PORT>" "<USER>@<HOSTNAME>"
+
+$ PORT: printf '%s\n' 22 2222 --- --header "Common SSH ports"
+
+# ================================ KEYGEN =====================================
+
+% keygen, ssh
+# Generate a new ed25519 keypair
+ssh-keygen -t ed25519 -C "<COMMENT>"
+
+% keygen, ssh
+@ var-keyfile
+# Change the passphrase on an existing private key
+ssh-keygen -p -f "<KEYFILE>"
+
+% keygen, ssh
+@ var-keyfile
+# Print the public key derived from a private key file
+ssh-keygen -y -f "<KEYFILE>"
+
+# ================================= AGENT =====================================
+
+% agent, ssh
+# Start an ssh-agent for this shell session
+eval "$(ssh-agent -s)"
+
+% agent, ssh
+@ var-keyfile
+# Load a private key into the running agent
+ssh-add "<KEYFILE>"
+
+% agent, ssh
+# List keys currently loaded in the agent
+ssh-add -l
+
+% agent, ssh, destructive
+# Wipe every key from the running agent
+ssh-add -D
+
+# =============================== COPY-ID =====================================
+
+% copy-id, ssh
+@ var-keyfile
+# Push a public key to a remote's authorized_keys
+ssh-copy-id -i "<KEYFILE>.pub" "<USER>@<HOSTNAME>"
+
+# ================================ CONFIG =====================================
+
+% config, ssh
+# Edit your SSH client config
+"${EDITOR:-nano}" ~/.ssh/config
+
+% config, ssh
+# Show your current SSH client config
+cat ~/.ssh/config
+
+# ================================ TUNNEL =====================================
+
+% tunnel, ssh
+@ var-sshhost
+# Local port forward: reach a remote-only service on localhost here
+ssh -L "<LOCAL_PORT>:localhost:<REMOTE_PORT>" "<HOST>"
+
+$ LOCAL_PORT: printf '%s\n' 8080 3000 5432 6379 --- --header "Local port to forward from"
+$ REMOTE_PORT: printf '%s\n' 80 443 3000 5432 6379 --- --header "Remote port to forward to"
+
+% tunnel, ssh
+@ var-sshhost
+# Dynamic SOCKS5 proxy through the remote host
+ssh -D "<SOCKS_PORT>" "<HOST>"
+
+$ SOCKS_PORT: printf '%s\n' 1080 8888 --- --header "Local SOCKS proxy port"
+
+% tunnel, ssh
+@ var-sshhost
+# Remote port forward: expose a local service on the remote side
+ssh -R "<REMOTE_PORT>:localhost:<LOCAL_PORT>" "<HOST>"
+
+$ REMOTE_PORT: printf '%s\n' 8080 3000 --- --header "Port to open on the remote side"
+$ LOCAL_PORT: printf '%s\n' 8080 3000 --- --header "Local port being exposed"
+
+# =============================== KNOWN_HOSTS ==================================
+
+% known_hosts, ssh
+# Remove a stale/changed host key entry
+ssh-keygen -R "<HOSTNAME>"
+
+% known_hosts, ssh, troubleshooting
+# Replace a host key entry — only after verifying the new key is actually legitimate
+ssh-keygen -R "<HOSTNAME>" && ssh-keyscan -H "<HOSTNAME>" >> ~/.ssh/known_hosts
+
+# ============================== TROUBLESHOOTING ================================
+
+% troubleshooting, ssh
+@ var-sshhost
+# Verbose connection debug — shows exactly where a handshake fails
+ssh -vvv "<HOST>"
+
+% troubleshooting, ssh
+# Non-interactive reachability test with a short timeout, no password prompt
+ssh -o BatchMode=yes -o ConnectTimeout=5 "<USER>@<HOSTNAME>"
+
+% troubleshooting, ssh
+# Is the local SSH server running?
+sudo systemctl status sshd
+
+% troubleshooting, ssh
+# Local SSH server's own logs for this boot
+sudo journalctl -u sshd -b --no-pager
+
+% discover, ssh
+# Confirm something's actually listening on the SSH port locally
+sudo ss -tlnp | grep ':22'
+
+# =============================== FILE TRANSFER =================================
+
+% file-transfer, ssh
+@ var-sshhost
+# Copy a file to/from a remote over SSH
+scp "<LOCAL_PATH>" "<HOST>:<REMOTE_PATH>"
+
+% file-transfer, ssh
+@ var-sshhost
+# Sync a file/directory over SSH, only transferring what changed
+rsync -avz -e ssh "<LOCAL_PATH>" "<HOST>:<REMOTE_PATH>"

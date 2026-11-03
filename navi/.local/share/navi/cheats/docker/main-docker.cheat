@@ -1,0 +1,144 @@
+; Docker cheatsheet — containers, images, compose, system. Shared variable generators are
+; in "% var-*" blocks; generators don't pipe through "| fzf" themselves, which would fight
+; with Navi's own built-in picker — they just output a clean list.
+
+# ============================ SHARED VARIABLES ============================
+
+% var-container
+
+$ CONTAINER: docker ps -a --format "{{.Names}}" --- --header "All containers (running + stopped)"
+
+% var-image
+
+$ IMAGE: docker images --format "{{.Repository}}:{{.Tag}}" --- --header "Local images"
+
+
+# ============================== COMPOSE ==============================
+
+% docker, compose
+# Start services, detached
+docker compose up -d
+
+
+% docker, compose
+# Stop services
+docker compose down
+
+
+% docker, compose
+# Rebuild images and restart
+docker compose up -d --build
+
+
+% docker, compose
+# Follow logs from all compose services
+docker compose logs -f
+
+
+% docker, compose
+# List running compose services
+docker compose ps
+
+
+# ============================== CONTAINERS ==============================
+
+% docker, containers
+# List running containers
+docker ps
+
+
+% docker, containers
+# List all containers, including stopped
+docker ps -a
+
+
+% docker, containers
+@ var-container
+# Start a stopped container
+docker start "<CONTAINER>"
+
+
+% docker, containers
+@ var-container
+# Stop a running container
+docker stop "<CONTAINER>"
+
+
+% docker, containers
+@ var-container
+# Restart a container
+docker restart "<CONTAINER>"
+
+
+% docker, containers
+@ var-container
+# Shell into a running container
+docker exec -it "<CONTAINER>" bash
+
+
+% docker, containers
+@ var-container
+# Follow a container's logs
+docker logs -f "<CONTAINER>"
+
+
+% docker, containers
+@ var-container
+# Full container metadata as JSON
+docker inspect "<CONTAINER>"
+
+
+% docker, containers, destructive
+@ var-container
+# Remove a container
+docker rm "<CONTAINER>"
+
+
+% docker, containers, destructive
+# Remove every stopped container
+docker container prune
+
+
+# ============================== IMAGES ==============================
+
+% docker, images
+# List local images
+docker images
+
+
+% docker, images
+# Pull an image
+docker pull "<image>:<tag>"
+
+
+% docker, images
+# Build an image from a Dockerfile in the current directory
+docker build -t "<name>:<tag>" .
+
+
+% docker, images, destructive
+@ var-image
+# Remove an image
+docker rmi "<IMAGE>"
+
+
+% docker, images, destructive
+# Remove every unused image
+docker image prune
+
+
+# ============================== SYSTEM ==============================
+
+% docker, system
+# Disk usage broken down by Docker
+docker system df
+
+
+% docker, system
+# Live per-container resource usage
+docker stats
+
+
+% docker, system, destructive
+# Remove every unused container, image, network and volume
+docker system prune -a --volumes

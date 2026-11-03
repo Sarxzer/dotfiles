@@ -1,0 +1,458 @@
+; General Linux/Arch daily-driver commands — files, permissions, processes, disk, networking,
+; pacman, systemd, symlinks, zoxide. Shared variable generators are in "% var-*" blocks.
+
+# ============================ SHARED VARIABLES ============================
+
+% var-pid
+
+$ PID: ps -eo pid,comm --sort=comm | awk '{$1=$1};1' --- --header "Running processes" --header-lines 1 --delimiter '\s+' --column 1
+
+% var-service
+
+$ SERVICE: systemctl list-units --type=service --no-legend --plain | awk '{print $1}' --- --header "Loaded systemd services"
+
+
+# ============================== DISK ==============================
+
+% linux, disk
+# Disk space usage per mount
+df -h
+
+
+% linux, disk
+# Memory usage
+free -h
+
+
+% linux, disk
+# System uptime and load average
+uptime
+
+
+% linux, disk
+# Running kernel version
+uname -r
+
+
+% linux, disk
+# OS identification info
+cat /etc/os-release
+
+
+% linux, disk
+# Block devices and partitions
+lsblk
+
+
+% linux, disk
+# Mount a device
+sudo mount "<device>" "<mountpoint>"
+
+
+% linux, disk
+# Unmount a device
+sudo umount "<mountpoint>"
+
+
+# ============================== FILES ==============================
+
+% linux, files
+# List files, detailed, human-readable sizes
+ls -lh
+
+
+% linux, files
+# List all files including hidden
+ls -la
+
+
+% linux, files
+# Find a file by name under a path
+find "<path>" -name "<pattern>"
+
+
+% linux, files
+# Find files modified in the last N days
+find "<path>" -mtime -"<days>"
+
+
+% linux, files
+# Search text inside files recursively
+grep -r "<pattern>" "<path>"
+
+
+% linux, files
+# Count lines in a file
+wc -l "<file>"
+
+
+% linux, files
+# Copy a file or folder
+cp -r "<source>" "<destination>"
+
+
+% linux, files
+# Move or rename a file/folder
+mv "<source>" "<destination>"
+
+
+% linux, files
+# Remove a file
+rm "<file>"
+
+
+% linux, files
+# Create a folder, including parent dirs
+mkdir -p "<folder>"
+
+
+% linux, files
+# Identify a file's actual type
+file "<file>"
+
+
+% linux, files
+# Disk usage of a folder
+du -sh "<folder>"
+
+
+% linux, files
+# Create a symbolic link
+ln -s "<target>" "<link>"
+
+
+% linux, files
+# Create a hard link
+ln "<target>" "<link>"
+
+
+% linux, files
+# Show what a symbolic link points to
+readlink "<link>"
+
+
+% linux, files
+# Resolve a link chain to its final absolute target
+readlink -f "<link>"
+
+
+% linux, files
+# Show a link's target inline
+ls -l "<link>"
+
+
+% linux, files, destructive
+# Recursively remove a folder WITHOUT confirmation — verify the path before running
+rm -rf "<folder>"
+
+
+% linux, files, destructive
+# Replace an existing symbolic link, even if it already points somewhere
+ln -sfn "<target>" "<link>"
+
+
+# ============================== MISC ==============================
+
+% linux, misc
+# Command history
+history
+
+
+% linux, misc
+# Repeat the last command
+!!
+
+
+% linux, misc
+# Show a manual page
+man "<command>"
+
+
+% linux, misc
+# Show what an alias/function/command actually resolves to
+type "<command>"
+
+
+% linux, misc
+# Extract a .tar.gz archive
+tar -xzvf "<file>.tar.gz"
+
+
+% linux, misc
+# Compress a folder into .tar.gz
+tar -czvf "<archive>.tar.gz" "<folder>"
+
+
+% linux, misc
+# List contents of a .tar.gz archive without extracting
+tar -tzvf "<file>.tar.gz"
+
+
+% linux, misc
+# Extract a .tar.xz archive
+tar -xJvf "<file>.tar.xz"
+
+
+% linux, misc
+# Show environment variables
+env
+
+
+# ============================== NETWORKING ==============================
+
+% linux, networking
+# Show IP addresses
+ip a
+
+
+% linux, networking
+# Ping a host
+ping "<host>"
+
+
+% linux, networking
+# Show open ports/connections
+sudo ss -tulpn
+
+
+% linux, networking
+# Download a file
+wget "<url>"
+
+
+% linux, networking
+# Download, keeping the remote filename
+curl -O "<url>"
+
+
+% linux, networking
+# Test DNS resolution
+dig "<domain>"
+
+
+% linux, networking
+# Show your public IP
+curl https://ifconfig.me
+
+
+% linux, networking
+# Copy a file to a remote host
+scp "<file>" "<user>@<host>:<path>"
+
+
+% linux, networking
+# Copy a folder to a remote host
+scp -r "<folder>" "<user>@<host>:<path>"
+
+
+# ============================== PACKAGES ==============================
+
+% linux, packages
+# Install a package
+sudo pacman -S "<package>"
+
+
+% linux, packages
+# Update the whole system
+sudo pacman -Syu
+
+
+% linux, packages
+# Search for a package
+pacman -Ss "<query>"
+
+
+% linux, packages
+# List explicitly installed packages
+pacman -Qe
+
+
+% linux, packages
+# Clear cached packages no longer installed
+sudo pacman -Sc
+
+
+% linux, packages, destructive
+# Remove a package
+sudo pacman -R "<package>"
+
+
+# ============================== PERMISSIONS ==============================
+
+% linux, permissions
+# Change file permissions
+chmod "<mode>" "<file>"
+
+
+% linux, permissions
+# Make a script executable
+chmod +x "<file>"
+
+
+% linux, permissions
+# Change owner
+chown "<user>:<group>" "<file>"
+
+
+% linux, permissions
+# Change owner recursively
+chown -R "<user>:<group>" "<folder>"
+
+
+% linux, permissions
+# Show the current user
+whoami
+
+
+% linux, permissions
+# Run one command as root
+sudo "<command>"
+
+
+% linux, permissions
+# Switch to a root shell
+sudo -i
+
+
+# ============================== PROCESSES ==============================
+
+% linux, processes
+# List every running process
+ps aux
+
+
+% linux, processes
+# Interactive process viewer
+htop
+
+
+% linux, processes
+# Find a process by name
+pgrep "<name>"
+
+
+% linux, processes
+@ var-pid
+# Kill a process by PID
+kill "<PID>"
+
+
+% linux, processes
+# Run a command in the background
+"<command>" &
+
+
+% linux, processes
+# List background jobs in this shell
+jobs
+
+
+% linux, processes
+# Bring a background job to the foreground
+fg %"<job_number>"
+
+
+% linux, processes, destructive
+@ var-pid
+# Force-kill a process by PID (SIGKILL — skips graceful shutdown)
+kill -9 "<PID>"
+
+
+% linux, processes, destructive
+# Kill every process matching a name
+pkill "<name>"
+
+
+% linux, processes, networking
+# Show what's using a port
+sudo lsof -i :"<port>"
+
+
+# ============================== SYSTEMD ==============================
+
+% linux, systemd
+@ var-service
+# Start a service now
+sudo systemctl start "<SERVICE>"
+
+
+% linux, systemd
+@ var-service
+# Stop a running service
+sudo systemctl stop "<SERVICE>"
+
+
+% linux, systemd
+@ var-service
+# Restart a service
+sudo systemctl restart "<SERVICE>"
+
+
+% linux, systemd
+@ var-service
+# Enable a service to start on boot
+sudo systemctl enable "<SERVICE>"
+
+
+% linux, systemd
+@ var-service
+# Check a service's current status
+systemctl status "<SERVICE>"
+
+
+% linux, systemd
+@ var-service
+# Follow a service's live logs
+journalctl -u "<SERVICE>" -f
+
+
+% linux, systemd
+# Logs from the current/last boot
+journalctl -b
+
+
+# ============================== ZOXIDE ==============================
+
+% linux, zoxide
+# Jump to a frequently used directory
+z "<directory>"
+
+
+% linux, zoxide
+# Jump using multiple search terms
+z "<term1>" "<term2>"
+
+
+% linux, zoxide
+# Interactive directory picker
+zi
+
+
+% linux, zoxide
+# Add a directory to zoxide's index
+zoxide add "<directory>"
+
+
+% linux, zoxide
+# List every directory zoxide knows
+zoxide query -l
+
+
+% linux, zoxide
+# Search the zoxide database
+zoxide query "<term>"
+
+
+% linux, zoxide, destructive
+# Remove a directory from zoxide's index
+zoxide remove "<directory>"
+
+
+% linux, zoxide, reference
+# One-time shell init line for .zshrc, not meant to be run standalone
+echo 'eval "$(zoxide init zsh)"'
+
+
+% linux, zoxide, reference
+# One-time shell init line for .bashrc, not meant to be run standalone
+echo 'eval "$(zoxide init bash)"'

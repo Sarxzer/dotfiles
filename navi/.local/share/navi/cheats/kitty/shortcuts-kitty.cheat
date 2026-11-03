@@ -1,0 +1,87 @@
+; Kitty terminal keybindings — reference only, every entry echoes the shortcut.
+; Defaults are Linux. Entries marked (custom) need the matching line in kitty.conf.
+
+# ============================== CONFIG ==============================
+
+% kitty, config
+# Reload kitty's config
+echo "Ctrl+Shift+F5"
+
+
+# ============================== TABS ==============================
+
+% kitty, tabs
+# New tab
+echo "Ctrl+Shift+T"
+
+
+% kitty, tabs
+# Close tab
+echo "Ctrl+Shift+Q"
+
+
+% kitty, tabs
+# Next tab
+echo "Ctrl+Shift+Right (or Ctrl+Tab)"
+
+
+% kitty, tabs
+# Previous tab
+echo "Ctrl+Shift+Left (or Ctrl+Shift+Tab)"
+
+
+% kitty, tabs
+# Move tab forward / backward
+echo "Ctrl+Shift+. / Ctrl+Shift+,"
+
+
+% kitty, tabs
+# Rename the current tab
+echo "Ctrl+Shift+Alt+T"
+
+
+% kitty, tabs
+# (custom) Jump to tab by number — map alt+1 goto_tab 1 (repeat for 2-9)
+echo "Alt+<num 1-9>"
+
+
+# ============================== PANES / SPLITS ==============================
+
+% kitty, splits
+# New pane
+echo "Ctrl+Shift+Enter"
+
+
+% kitty, splits
+# Close current pane
+echo "Ctrl+Shift+W"
+
+
+% kitty, splits
+# Focus next / previous pane
+echo "Ctrl+Shift+] / Ctrl+Shift+["
+
+
+% kitty, splits
+# Jump to pane by number
+echo "Ctrl+Shift+<num 1-9>"
+
+
+% kitty, splits
+# Cycle layouts
+echo "Ctrl+Shift+L"
+
+
+% kitty, splits
+# (custom) Vertical split — map ctrl+shift+\ launch --location=vsplit
+echo 'Ctrl+Shift+\'
+
+
+% kitty, splits
+# (custom) Horizontal split — map ctrl+shift+- launch --location=hsplit
+echo "Ctrl+Shift+-"
+
+
+% kitty, splits
+# (custom) Focus neighboring pane — map ctrl+alt+left neighboring_window left (etc.)
+echo "Ctrl+Alt+<arrow key>"

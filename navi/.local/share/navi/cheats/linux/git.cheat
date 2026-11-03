@@ -1,0 +1,274 @@
+; Git cheatsheet — branches, commits, remotes, stashing, rebasing, recovery.
+; Shared variable generators are in the "% var-*" blocks; real entries pull them in with "@".
+
+# ============================ SHARED VARIABLES ===============================
+
+% var-branch
+
+$ BRANCH: git branch --format='%(refname:short)' --- --header "Local branches"
+
+% var-remote
+
+$ REMOTE: git remote --- --header "Configured remotes"
+
+% var-tag
+
+$ TAG: git tag --- --header "Existing tags"
+
+% var-stash
+
+$ STASH: git stash list --format='%gd' --- --header "Stash entries"
+
+% var-file
+
+$ FILE: git status --porcelain | awk '{print $2}' --- --header "Changed/untracked files"
+
+% var-commit
+
+$ COMMIT: git log --oneline -20 --- --header "Recent commits (pick the hash column)"
+
+# ================================ STATUS =====================================
+
+% discover, git
+# Working tree + staging status
+git status
+
+% discover, git
+# Compact commit graph, last 20
+git log --oneline --graph --decorate -20
+
+% discover, git
+@ var-branch
+# Commit log of a specific branch
+git log "<BRANCH>" --oneline -20
+
+# ================================ BRANCH =====================================
+
+% branch, git
+@ var-branch
+# Switch to an existing branch
+git checkout "<BRANCH>"
+
+% branch, git
+# Create and switch to a new branch
+git checkout -b "<NEW_BRANCH>"
+
+% branch, git, destructive
+@ var-branch
+# Force-delete a local branch, even if unmerged
+git branch -D "<BRANCH>"
+
+% branch, git
+@ var-branch
+# Rename a local branch
+git branch -m "<BRANCH>" "<NEW_NAME>"
+
+# ================================ COMMIT =====================================
+
+% commit, git
+# Stage everything and commit in one go
+git add -A && git commit -m "<MESSAGE>"
+
+% commit, git
+@ var-file
+# Stage a single changed/untracked file
+git add "<FILE>"
+
+% commit, git
+# Add currently staged changes to the last commit, keep its message
+git commit --amend --no-edit
+
+% commit, git, destructive
+# Rewrite the last commit's message (or contents, if staged first)
+git commit --amend -m "<MESSAGE>"
+
+# ================================ REMOTE =====================================
+
+% remote, git
+@ var-remote
+# List configured remotes and their URLs
+git remote -v
+
+% remote, git
+# Add a new remote
+git remote add "<REMOTE_NAME>" "<URL>"
+
+% remote, git
+@ var-remote
+@ var-branch
+# Push a branch to a remote
+git push "<REMOTE>" "<BRANCH>"
+
+% remote, git
+@ var-remote
+@ var-branch
+# Push and set upstream tracking in one go
+git push -u "<REMOTE>" "<BRANCH>"
+
+% remote, git, destructive
+@ var-remote
+@ var-branch
+# Force-push safely — aborts if the remote has commits you haven't seen
+git push --force-with-lease "<REMOTE>" "<BRANCH>"
+
+% remote, git
+@ var-remote
+# Fetch new commits from a remote without merging
+git fetch "<REMOTE>"
+
+% remote, git
+@ var-remote
+# Fetch and merge/rebase from a remote
+git pull "<REMOTE>"
+
+% remote, git
+@ var-remote
+@ var-tag
+# Push a single tag to a remote
+git push "<REMOTE>" "<TAG>"
+
+# ================================ STASH ======================================
+
+% stash, git
+# Stash current changes with a note
+git stash push -m "<MESSAGE>"
+
+% stash, git
+@ var-stash
+# Apply a stash but keep it in the stash list
+git stash apply "<STASH>"
+
+% stash, git
+@ var-stash
+# Apply a stash and remove it from the stash list
+git stash pop "<STASH>"
+
+% stash, git, destructive
+@ var-stash
+# Permanently delete a stash entry
+git stash drop "<STASH>"
+
+# ================================= DIFF ======================================
+
+% diff, git
+# Unstaged changes vs the last commit
+git diff
+
+% diff, git
+# Staged changes vs the last commit
+git diff --staged
+
+% diff, git
+@ var-branch
+# Diff current branch against another
+git diff "<BRANCH>"
+
+% log, git
+@ var-file
+# Full commit history + diffs for one file
+git log -p -- "<FILE>"
+
+% log, git
+# Commit history filtered by author
+git log --author="<AUTHOR>"
+
+# ================================ REBASE =====================================
+
+% rebase, git
+@ var-branch
+# Rebase the current branch onto another
+git rebase "<BRANCH>"
+
+% rebase, git, destructive
+# Interactively edit/squash/reorder the last N commits
+git rebase -i HEAD~"<N>"
+
+$ N: printf '%s\n' 3 5 10 20 --- --header "Number of commits back"
+
+% rebase, git, recovery
+# Bail out of an in-progress rebase, restore pre-rebase state
+git rebase --abort
+
+% rebase, git
+# Continue a rebase after resolving conflicts
+git rebase --continue
+
+# ================================ RESET ======================================
+
+% reset, git, destructive
+# Rewind the branch pointer N commits, discarding those commits' changes
+git reset --hard HEAD~"<N>"
+
+$ N: printf '%s\n' 1 2 3 5 --- --header "Number of commits back"
+
+% reset, git
+@ var-file
+# Unstage a file, keep its working-tree changes
+git restore --staged "<FILE>"
+
+% reset, git, destructive
+@ var-file
+# Discard uncommitted changes to a file, back to last commit
+git checkout -- "<FILE>"
+
+# ================================= TAG =======================================
+
+% tag, git
+@ var-tag
+# Check out a tag (detached HEAD)
+git checkout "<TAG>"
+
+% tag, git
+# Create an annotated tag
+git tag -a "<TAG>" -m "<MESSAGE>"
+
+# ============================== WORKTREE / SUBMODULE =========================
+
+% worktree, git
+# Check out a branch into a separate working directory
+git worktree add "<PATH>" "<BRANCH>"
+
+$ BRANCH: git branch --format='%(refname:short)' --- --header "Local branches"
+
+% worktree, git
+# List all active worktrees
+git worktree list
+
+% submodule, git
+# Clone/update all submodules recursively
+git submodule update --init --recursive
+
+# ================================ CONFIG =====================================
+
+% config, git
+# Set your global commit author name
+git config --global user.name "<NAME>"
+
+% config, git
+# Set your global commit author email
+git config --global user.email "<EMAIL>"
+
+% config, git
+# Show all effective git config values
+git config --list
+
+# =============================== RECOVERY ====================================
+
+% recovery, git
+# Full history of HEAD movements — the real safety net for "I lost a commit"
+git reflog
+
+% recovery, git
+# Find dangling/unreachable commits git hasn't garbage-collected yet
+git fsck --lost-found
+
+% recovery, git
+@ var-commit
+# Apply one specific commit from elsewhere onto the current branch
+git cherry-pick "<COMMIT>"
+
+% recovery, git, destructive
+# Rewind the branch pointer to any reflog entry — recovers commits a reset/rebase seemingly lost
+git reset --hard "<REFLOG_ENTRY>"
+
+$ REFLOG_ENTRY: git reflog --format='%h %gs' -20 --- --header "Reflog entries — recover a 'lost' state"

@@ -1,0 +1,240 @@
+; Vim keybindings — reference only, every entry echoes the keystroke/command rather than
+; running it. Fixed from the original: several entries here weren't wrapped in echo and would
+; have tried to execute Vim ex-commands as shell commands (guaranteed "command not found").
+; Also fixed: ":s" was mislabeled as a window-split command — it's actually substitute.
+
+# ============================== EDITING ==============================
+
+% vim, editing
+# Delete line
+echo "dd"
+
+
+% vim, editing
+# Delete word
+echo "dw"
+
+
+% vim, editing
+# Yank (copy) line
+echo "yy"
+
+
+% vim, editing
+# Paste after cursor
+echo "p"
+
+
+% vim, editing
+# Paste before cursor
+echo "P"
+
+
+% vim, editing
+# Undo
+echo "u"
+
+
+% vim, editing
+# Redo
+echo "Ctrl+R"
+
+
+% vim, editing
+# Delete a paragraph (was previously not echo-wrapped — would have failed as a shell command)
+echo "dap"
+
+
+% vim, editing
+# Replace character under cursor
+echo "r<char>"
+
+
+% vim, editing
+# Repeat last change
+echo "."
+
+
+# ============================== FILES ==============================
+
+% vim, files
+# Save file
+echo ":w"
+
+
+% vim, files
+# Save and quit
+echo ":wq"
+
+
+% vim, files
+# Save as a different filename
+echo ":w <filename>"
+
+
+% vim, files
+# Open a file
+echo ":e <filename>"
+
+
+% vim, files, destructive
+# Quit without saving
+echo ":q!"
+
+
+# ============================== MODES ==============================
+
+% vim, modes
+# Enter insert mode
+echo "i"
+
+
+% vim, modes
+# Enter insert mode at start of line
+echo "I"
+
+
+% vim, modes
+# Enter insert mode after cursor
+echo "a"
+
+
+% vim, modes
+# Enter insert mode at end of line
+echo "A"
+
+
+% vim, modes
+# Enter visual mode (character-wise)
+echo "v"
+
+
+% vim, modes
+# Enter visual line mode
+echo "V"
+
+
+% vim, modes
+# Enter visual block mode
+echo "Ctrl+V"
+
+
+% vim, modes
+# Return to normal mode
+echo "Esc"
+
+
+# ============================== MOVEMENT ==============================
+
+% vim, movement
+# Move to start of line
+echo "0"
+
+
+% vim, movement
+# Move to first non-blank character
+echo "^"
+
+
+% vim, movement
+# Move to end of line
+echo "$"
+
+
+% vim, movement
+# Move to top of file
+echo "gg"
+
+
+% vim, movement
+# Move to bottom of file
+echo "G"
+
+
+% vim, movement
+# Move to a specific line number
+echo "<num>G"
+
+
+% vim, movement
+# Jump to the matching bracket
+echo "%"
+
+
+% vim, movement
+# Move forward one word
+echo "w"
+
+
+% vim, movement
+# Move back one word
+echo "b"
+
+
+% vim, movement, tabs
+# Next tab
+echo "gt"
+
+
+% vim, movement, tabs
+# Previous tab
+echo "gT"
+
+
+% vim, movement, windows
+# Move between split windows
+echo "Ctrl+W then h/j/k/l"
+
+
+# ============================== SEARCH ==============================
+
+% vim, search
+# Search forward
+echo "/<pattern>"
+
+
+% vim, search
+# Search backward
+echo "?<pattern>"
+
+
+% vim, search
+# Jump to next match
+echo "n"
+
+
+% vim, search
+# Jump to previous match
+echo "N"
+
+
+% vim, search
+# Find and replace every match in the file (was previously not echo-wrapped)
+echo "%s/<old>/<new>/g"
+
+
+% vim, search
+# Find and replace with confirmation prompt per match
+echo "%s/<old>/<new>/gc"
+
+; every entry below was previously a raw, un-echoed ex-command — selecting any of them in
+; Navi would have tried to run ":w" etc. as a literal shell command and failed outright.
+
+
+# ============================== TABS ==============================
+
+% vim, tabs
+# Open a new tab
+echo ":tabnew <filename>"
+
+
+# ============================== WINDOWS ==============================
+
+% vim, windows
+# Split window horizontally — ":s" (the original label here) is actually substitute, not a split
+echo ":split"
+
+
+% vim, windows
+# Split window vertically
+echo ":vsplit"
