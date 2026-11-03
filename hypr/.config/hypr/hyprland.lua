@@ -65,7 +65,6 @@ hl.on("hyprland.start", function ()
     hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")
     hl.exec_cmd("/usr/lib/polkit-kde-authentication-agent-1")
     hl.exec_cmd("wl-paste --watch cliphist store")
-    hl.exec_cmd("syncthing-tray")
 
     -- machine-specific extras from local.lua
     for _, cmd in ipairs(L.autostart) do hl.exec_cmd(cmd) end

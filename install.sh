@@ -31,7 +31,7 @@ PKGS=(
   zsh eza bat zoxide navi fzf hyfetch fastfetch less libnotify zsh-autocomplete
   ttf-meslo-nerd                       # nerd font for powerlevel10k / eza icons
   # editor + what neovim plugins / LSPs usually need
-  neovim lazygit ripgrep fd unzip nodejs npm go tree-sitter-cli   # lazygit: LazyVim's git UI
+  neovim lazygit ripgrep fd unzip nodejs npm go tree-sitter-cli   # lazygit.nvim 
   # terminal + desktop
   kitty dolphin kate
   hyprland noctalia
@@ -197,7 +197,7 @@ main() {
   cat <<'EOF'
 
 Per-machine things this script does NOT do:
-  * Hyprland: monitor names (hyprctl monitors) and keyboard layout (laptop us / desktop fr)
+  * create ~/.config/hypr/local.lua
   * Noctalia: copy gui.toml settings, then enable the Qt/KColorScheme/GTK templates
   * qt6ct: run it once and pick the "noctalia" color scheme
   * Log out and back in so the shell, env vars and portals pick everything up

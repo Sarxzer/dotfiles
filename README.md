@@ -33,13 +33,12 @@ To link a single package by hand: `stow hypr` (run from the repo folder).
 
 ## Keybinds
 
-`Super` is the main modifier. Press **Super + F1** for the full cheat sheet.
+`Super` is the main modifier. Press **Super + F1** for the full cheat sheet using navi.
 
 | Keys                | Action                       |
 | ------------------- | ---------------------------- |
 | `Super + Space`     | Launcher                     |
-| `Super + Q`         | Terminal                     |
-| `Super + F12`       | Dropdown terminal            |
+| `Super + Q`         | Terminal in a dropdown       |
 | `Super + F`         | Fullscreen                   |
 | `Super + R`         | Resize mode (`Esc` to leave) |
 | `Super + 1..0`      | Go to workspace              |
@@ -56,4 +55,4 @@ git pull --rebase --autostash     # on the other machine
 
 ## Credits
 
-[Hyprland](https://hypr.land) · [Noctalia](https://docs.noctalia.dev) · [oh-my-zsh](https://ohmyz.sh) · [powerlevel10k](https://github.com/romkatv/powerlevel10k) · [LazyVim](https://www.lazyvim.org) · [zsh-auto-notify](https://github.com/MichaelAquilina/zsh-auto-notify)
+[Hyprland](https://hypr.land) · [Noctalia](https://docs.noctalia.dev) · [oh-my-zsh](https://ohmyz.sh) · [powerlevel10k](https://github.com/romkatv/powerlevel10k) · [zsh-auto-notify](https://github.com/MichaelAquilina/zsh-auto-notify)

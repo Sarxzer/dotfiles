@@ -2,10 +2,9 @@ HYPRLAND KEYBINDS            (q = close, arrows = scroll)
   ============================================================
 
   APPS
-    Super + Q              terminal (kitty)
+    Super + Q              terminal (kitty) in a dropdown
     Super + E              file manager (dolphin)
     Super + F12            dropdown terminal
-    Super + Space          launcher (Noctalia)
     Super + S              control center
     Super + ,              Noctalia settings
     Alt + Tab              window switcher
