@@ -1,0 +1,12 @@
+local o = vim.opt
+o.number = true
+o.relativenumber = true
+o.expandtab = true
+o.shiftwidth = 2   -- use 4 if you prefer
+o.tabstop = 2
+o.ignorecase = true
+o.smartcase = true
+o.clipboard = "unnamedplus"  -- uses wl-clipboard, which your install.sh already installs
+o.signcolumn = "yes"
+o.scrolloff = 8
+o.undofile = true
