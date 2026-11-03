@@ -1,0 +1,75 @@
+% nvim, lazygit, git
+# Open LazyGit (keymap: Space g g)
+echo ':LazyGit'
+
+% nvim, lazygit, git
+# LazyGit filtered on the current file's history
+echo ':LazyGitCurrentFile'
+
+% nvim, fugitive, git
+# Fugitive status window (s stage, u unstage, cc commit)
+echo ':Git'
+
+% nvim, fugitive, git
+# Blame sidebar for the whole file
+echo ':Git blame'
+
+% nvim, fugitive, git
+# Side-by-side diff against the index
+echo ':Gvdiffsplit'
+
+% nvim, fugitive, git
+# 3-way merge conflict view
+echo ':Gvdiffsplit!'
+
+% nvim, fugitive, git
+# In a conflict: take ours (left) / theirs (right)
+echo ':diffget //2  |  :diffget //3'
+
+% nvim, fugitive, git
+# File history in the quickfix list
+echo ':0Gclog'
+
+% nvim, clipboard
+# Yank a line straight to the system clipboard
+echo '"+yy'
+
+% nvim, clipboard
+# Copy the last yank/delete to the system clipboard
+echo ':let @+=@"'
+
+% nvim, clipboard
+# Make every yank use the system clipboard (put in init.lua)
+echo 'vim.opt.clipboard = "unnamedplus"'
+
+% nvim, clipboard
+# Check clipboard provider (xclip / wl-clipboard)
+echo ':checkhealth provider'
+
+% nvim, files
+# Reload buffers changed on disk (after lazygit, git pull...)
+echo ':checktime'
+
+% nvim, neo-tree, files
+# Open Neo-tree on a specific folder
+echo ':Neotree dir=<path>'
+
+% nvim, neo-tree, files
+# Reveal the current file in the tree
+echo ':Neotree reveal'
+
+% nvim, cord, discord
+# Update cord's server binary
+echo ':Cord update'
+
+% nvim, cord, discord
+# Restart cord (when presence stops showing)
+echo ':Cord restart'
+
+% nvim, lazy, plugins
+# Profile plugin startup time
+echo ':Lazy profile'
+
+% nvim, lazy, plugins
+# Check lazy.nvim health
+echo ':Lazy health'

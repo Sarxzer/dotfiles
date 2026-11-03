@@ -1,0 +1,67 @@
+% lazygit, nvim, git
+# Open LazyGit from nvim (leader is Space)
+echo 'Space g g'
+
+% lazygit, panels
+# Jump to a panel: 1 Status, 2 Files, 3 Branches, 4 Commits, 5 Stash
+echo '1 2 3 4 5'
+
+% lazygit, files
+# Stage / unstage the selected file or folder
+echo 'Space'
+
+% lazygit, files
+# Stage / unstage everything
+echo 'a'
+
+% lazygit, files
+# Commit staged changes
+echo 'c'
+
+% lazygit, files
+# Amend the last commit
+echo 'A'
+
+% lazygit, files
+# Discard changes menu (careful!)
+echo 'd'
+
+% lazygit, files
+# Stash options menu
+echo 's'
+
+% lazygit, stash
+# Stash panel: apply (keeps stash) / pop (restores + deletes)
+echo 'Space  |  g'
+
+% lazygit, branches
+# Checkout the selected branch
+echo 'Space'
+
+% lazygit, branches
+# New branch / delete branch / merge into current
+echo 'n  |  d  |  M'
+
+% lazygit, commits
+# Reword / squash down / fixup / drop the selected commit
+echo 'r  |  s  |  f  |  d'
+
+% lazygit, remote
+# Push / pull
+echo 'P  |  p'
+
+% lazygit, general
+# Undo the last git action (via reflog) / redo
+echo 'z  |  Ctrl + z'
+
+% lazygit, general
+# Filter the current list
+echo '/'
+
+% lazygit, general
+# Show all keybindings for the current panel
+echo '?'
+
+% lazygit, general
+# Quit lazygit
+echo 'q'

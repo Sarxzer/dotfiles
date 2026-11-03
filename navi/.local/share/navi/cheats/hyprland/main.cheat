@@ -1,0 +1,111 @@
+% hyprland, keybinds
+# Dropdown terminal (kitty, special workspace)
+echo 'Super + Q'
+
+% hyprland, keybinds
+# Launcher (Noctalia)
+echo 'Super + Space'
+
+% hyprland, keybinds
+# Control center
+echo 'Super + S'
+
+% hyprland, keybinds
+# Noctalia settings
+echo 'Super + ,'
+
+% hyprland, keybinds
+# Window switcher
+echo 'Alt + Tab'
+
+% hyprland, keybinds
+# Keybinds cheat sheet
+echo 'Super + F1'
+
+% hyprland, keybinds
+# File manager (dolphin)
+echo 'Super + E'
+
+% hyprland, keybinds
+# Close window
+echo 'Super + C'
+
+% hyprland, keybinds
+# Fullscreen
+echo 'Super + F'
+
+% hyprland, keybinds
+# Toggle floating
+echo 'Super + V'
+
+% hyprland, keybinds
+# Pseudo-tile
+echo 'Super + P'
+
+% hyprland, keybinds
+# Toggle split direction
+echo 'Super + J'
+
+% hyprland, keybinds
+# Move focus / move window
+echo 'Super + Arrows  |  Super + Shift + Arrows'
+
+% hyprland, keybinds
+# Resize mode (arrows resize, Esc or Return to leave)
+echo 'Super + R'
+
+% hyprland, keybinds
+# Move / resize window with the mouse
+echo 'Super + Left drag  |  Super + Right drag'
+
+% hyprland, keybinds, workspaces
+# Go to workspace / send window to workspace
+echo 'Super + 1..0  |  Super + Shift + 1..0'
+
+% hyprland, keybinds, workspaces
+# Jump to an empty workspace / back to previous
+echo 'Super + D  |  Super + Shift + D'
+
+% hyprland, keybinds, screenshots
+# Screenshot region / full screen
+echo 'Print or Super + Shift + S  |  Shift + Print or Super + Shift + F'
+
+% hyprland, keybinds, session
+# Exit Hyprland
+echo 'Super + M'
+
+% hyprland, hyprctl
+# Reload the config
+hyprctl reload
+
+% hyprland, hyprctl
+# Show config errors
+hyprctl configerrors
+
+% hyprland, hyprctl
+# List monitors (names, resolution, scale)
+hyprctl monitors
+
+% hyprland, hyprctl
+# List open windows (class, title, workspace)
+hyprctl clients
+
+% hyprland, hyprctl
+# Info about the focused window (handy for window rules)
+hyprctl activewindow
+
+% hyprland, hyprctl
+# List input devices (keyboard names for layout config)
+hyprctl devices
+
+% hyprland, hyprctl
+# Kill a window by clicking on it
+hyprctl kill
+
+% hyprland, hyprctl
+# Read a config option's current value
+hyprctl getoption <option>
+
+% hyprland, hyprctl
+# Hyprland version and build info
+hyprctl version
