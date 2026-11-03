@@ -6,11 +6,34 @@
 -- Refer to the wiki for more information.
 -- https://wiki.hypr.land/Configuring/Start/
 
-local L = { kb_layout = "us", kb_variant = "" }  -- defaults (laptop)
-pcall(function()
-local over = dofile(os.getenv("HOME") .. "/.config/hypr/local.lua")
-for k, v in pairs(over) do L[k] = v end
-    end)
+
+---@diagnostic disable: undefined-global
+
+
+-- Per-machine settings live in ~/.config/hypr/local.lua (gitignored, optional).
+-- It returns a table whose keys replace the defaults below:
+--   kb_layout, kb_variant, monitors, autostart
+-- It can also hold `late = function() ... end`, which runs at the very end of
+-- this file, so it can call hl.* to add or override things.
+local L = {
+    kb_layout = "us", kb_variant = "",   -- defaults (laptop)
+    monitors  = {
+        { output = "eDP-1",    mode = "preferred", position = "auto", scale = "1" },
+        { output = "HDMI-A-1", mode = "preferred", position = "auto", scale = "1" },
+    },
+    autostart = {},
+}
+
+local local_err
+do
+    local ok, over = pcall(dofile, os.getenv("HOME") .. "/.config/hypr/local.lua")
+    if ok and type(over) == "table" then
+        for k, v in pairs(over) do L[k] = v end
+    elseif not ok and not tostring(over):find("cannot open", 1, true) then
+        -- the file exists but is broken: say so once the session has started
+        local_err = tostring(over)
+    end
+end
 
 
 ------------------
@@ -18,19 +41,10 @@ for k, v in pairs(over) do L[k] = v end
 ------------------
 
 -- See https://wiki.hypr.land/Configuring/Basics/Monitors/
-hl.monitor({
-    output   = "eDP-1",
-    mode     = "preferred",
-    position = "auto",
-    scale    = "1",
-})
-
-hl.monitor({
-    output   = "HDMI-A-1",
-    mode     = "preferred",
-    position = "auto",
-    scale    = "1",
-})
+-- The list comes from L.monitors (defaults above, replaced by local.lua).
+for _, m in ipairs(L.monitors) do
+    hl.monitor(m)
+end
 
 
 ---------------------
@@ -48,9 +62,17 @@ local fileManager = "dolphin"
 hl.on("hyprland.start", function ()
     hl.exec_cmd("noctalia")
     hl.exec_cmd("/usr/lib/pam_kwallet_init")
-    hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY_CURRENT_DESKTOP")
+    hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")
     hl.exec_cmd("/usr/lib/polkit-kde-authentication-agent-1")
     hl.exec_cmd("wl-paste --watch cliphist store")
+    hl.exec_cmd("syncthing-tray")
+
+    -- machine-specific extras from local.lua
+    for _, cmd in ipairs(L.autostart) do hl.exec_cmd(cmd) end
+
+    if local_err then
+        hl.exec_cmd("notify-send -u critical 'hypr local.lua is broken' '" .. local_err:gsub("'", "") .. "'")
+    end
 end)
 
 
@@ -76,8 +98,8 @@ hl.config({
 
         col = {
             -- VoidViolet purple (was the default cyan/green gradient)
-active_border   = { colors = {"rgba(a855f7ee)", "rgba(7c3aedee)"}, angle = 45 },
-          inactive_border = "rgba(2e2742aa)",
+-- active_border   = { colors = {"rgba(a855f7ee)", "rgba(7c3aedee)"}, angle = 45 },
+--           inactive_border = "rgba(2e2742aa)",
         },
 
         resize_on_border = false,
@@ -178,7 +200,6 @@ hl.config({
 
 hl.config({
     input = {
-        -- Change to "fr" if your keyboard is AZERTY
         kb_layout  = L.kb_layout,
         kb_variant = L.kb_variant,
         kb_model   = "",
@@ -209,7 +230,6 @@ hl.gesture({
 local mainMod = "SUPER"
 local ipc = "noctalia msg "
 
-hl.bind(mainMod .. " + H", hl.dsp.exec_cmd("steam steam://run/322500"))
 
 -- Noctalia
 hl.bind(mainMod .. " + Space", hl.dsp.exec_cmd(ipc .. "panel-toggle launcher"))
@@ -257,12 +277,13 @@ hl.define_submap("resize", function()
 end)
 hl.bind(mainMod .. " + R", hl.dsp.submap("resize"))
 
-hl.bind(mainMod .. " + F1", hl.dsp.exec_cmd("kitty --class cheatsheet -e less ~/.config/hypr/keybinds.txt"))
+hl.bind(mainMod .. " + F1", hl.dsp.exec_cmd("kitty --class cheatsheet -e navi"))
 
 hl.window_rule({
     name  = "cheatsheet",
     match = { class = "cheatsheet" },
     float = true,
+    pin = true,
     size  = { 700, 650 },
 })
 
@@ -377,5 +398,23 @@ hl.window_rule({
     pin   = true,
 })
 
+
+hl.layer_rule({
+    name = "oneko-no-anim",
+    match = { namespace = "oneko" },
+    no_anim = true,
+})
+
 -- For Noctalia Color templates
 require("noctalia").apply_theme()
+
+
+------------------------------
+---- LOCAL HOOK (keep last) ----
+------------------------------
+
+-- Runs last on purpose, so local.lua can add binds/rules or override what's above.
+if type(L.late) == "function" then
+    local ok, err = pcall(L.late)
+    if not ok then local_err = tostring(err) end
+end
