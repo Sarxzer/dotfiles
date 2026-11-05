@@ -300,7 +300,6 @@ hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))    -- dwindle only
-hl.bind(mainMod .. " + B", hl.dsp.workspace.toggle_special("mail")) -- thunderbird
 -- Move focus with mainMod + arrow keys
 hl.bind(mainMod .. " + left",  hl.dsp.focus({ direction = "left" }))
 hl.bind(mainMod .. " + right", hl.dsp.focus({ direction = "right" }))
@@ -355,11 +354,6 @@ hl.window_rule({
     size  = { 1080, 920 },
 })
 
-hl.window_rule({
-    name  = "thunderbird-hidden",
-    match = { class = "^(thunderbird)$" },
-               workspace = "special:mail silent",
-})
 
 -- Blur for Noctalia's bar, panels, dock and notifications
 hl.layer_rule({
