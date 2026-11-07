@@ -583,6 +583,29 @@ echo '@q / @@'
 echo '20@q'
 
 
+# ============================== CMDLINE WINDOW ==============================
+
+% nvim, core, cmdline
+# Open the command-line window (editable ':' history)
+echo 'q:'
+
+% nvim, core, cmdline
+# Open the search history window (forward / backward)
+echo 'q/ / q?'
+
+% nvim, core, cmdline
+# Switch from the ':' prompt into the cmdline window
+echo 'Ctrl+f  (while typing a command)'
+
+% nvim, core, cmdline
+# Run the line under the cursor (inside the cmdline window)
+echo 'Enter'
+
+% nvim, core, cmdline
+# Close the cmdline window without running anything
+echo ':q  (or Ctrl+c)'
+
+
 # ============================== FOLDS ==============================
 
 % nvim, core, folds
