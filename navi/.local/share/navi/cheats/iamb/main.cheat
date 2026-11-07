@@ -1,0 +1,267 @@
+# ============================== CONFIG & GENERAL ==============================
+
+% iamb, matrix, config
+# Config file location
+echo '~/.config/iamb/config.toml'
+
+% iamb, matrix, config
+# Switch theme (e.g. a Noctalia-generated one)
+echo ':theme <name>'
+
+% iamb, matrix, general
+# Show the welcome window (key hints and commands)
+echo ':welcome'
+
+% iamb, matrix, general
+# Log out
+echo ':logout'
+
+
+# ============================== ROOM LISTS ==============================
+
+% iamb, matrix, rooms
+# Combined list of DMs and rooms
+echo ':chats'
+
+% iamb, matrix, rooms
+# List direct messages
+echo ':dms'
+
+% iamb, matrix, rooms
+# List joined rooms
+echo ':rooms'
+
+% iamb, matrix, rooms
+# List joined spaces / only top-level spaces
+echo ':spaces  |  :spaces toplevel'
+
+% iamb, matrix, rooms
+# List unread rooms
+echo ':unreads'
+
+% iamb, matrix, rooms
+# Mark all rooms as read
+echo ':unreads clear'
+
+% iamb, matrix, rooms
+# List rooms where you were mentioned
+echo ':mentions'
+
+% iamb, matrix, rooms
+# List pending room invites
+echo ':invites'
+
+% iamb, matrix, rooms
+# List members of the focused room
+echo ':members'
+
+% iamb, matrix, rooms
+# Join a room (id, alias, matrix.to link) or open a DM (user id)
+echo ':join <room>'
+
+% iamb, matrix, rooms
+# Leave the focused room
+echo ':leave'
+
+
+# ============================== WRITING MESSAGES ==============================
+
+% iamb, matrix, messages
+# Send the typed message
+echo 'Enter'
+
+% iamb, matrix, messages
+# Newline without sending (insert mode)
+echo 'Shift+Enter  (or Ctrl+v Ctrl+j)'
+
+% iamb, matrix, messages
+# Toggle focus between the message bar and the scrollback
+echo 'Ctrl+w m'
+
+% iamb, matrix, messages
+# Compose the message in $EDITOR
+echo ':editor'
+
+% iamb, matrix, messages
+# Upload a file to the current room
+echo ':upload <path>'
+
+
+# ============================== ACTING ON MESSAGES ==============================
+# Select a message in the scrollback first (Ctrl+w m to focus it)
+
+% iamb, matrix, messages
+# Reply to the selected message
+echo ':reply'
+
+% iamb, matrix, messages
+# Cancel the draft (including a pending reply)
+echo ':cancel'
+
+% iamb, matrix, messages
+# Edit the selected message
+echo ':edit'
+
+% iamb, matrix, messages
+# React to the selected message / remove your reaction
+echo ':react <shortcode>  |  :unreact [shortcode]'
+
+% iamb, matrix, messages
+# Delete (redact) the selected message
+echo ':redact [reason]'
+
+% iamb, matrix, messages
+# Pin / unpin the selected message
+echo ':pin  |  :unpin'
+
+% iamb, matrix, messages
+# List pinned messages (select one to jump to it)
+echo ':pinned'
+
+% iamb, matrix, messages
+# Jump to the message the current one replies to
+echo ':replied'
+
+% iamb, matrix, messages
+# Show details of the focused message
+echo ':message'
+
+% iamb, matrix, messages
+# Download an attachment (optionally to a path)
+echo ':download [path]'
+
+% iamb, matrix, messages
+# Open an attachment or a link in the message
+echo ':open'
+
+
+# ============================== WINDOWS & TABS ==============================
+
+% iamb, matrix, windows
+# Toggle the current window fullscreen
+echo 'Ctrl+w z'
+
+% iamb, matrix, windows
+# Open a room in a horizontal / vertical split
+echo ':split  |  :vsplit'
+
+% iamb, matrix, windows
+# Keep only the current window in this tab
+echo ':only'
+
+% iamb, matrix, windows
+# Close the window / all windows in the tab
+echo ':quit  |  :quitall'
+
+% iamb, matrix, tabs
+# Open a room in a new tab
+echo ':tabedit <room>'
+
+% iamb, matrix, tabs
+# Next / previous / first / last tab
+echo ':tabnext  |  :tabprevious  |  :tabrewind  |  :tablast'
+
+% iamb, matrix, tabs
+# Close the tab / close all other tabs
+echo ':tabclose  |  :tabonly'
+
+
+# ============================== ENCRYPTION & VERIFICATION ==============================
+
+% iamb, matrix, e2ee
+# Show ongoing verifications
+echo ':verify'
+
+% iamb, matrix, e2ee
+# Request verification with a user
+echo ':verify request <user>'
+
+% iamb, matrix, e2ee
+# Accept an incoming verification request
+echo ':verify accept'
+
+% iamb, matrix, e2ee
+# Switch to interactive emoji verification
+echo ':verify emoji'
+
+% iamb, matrix, e2ee
+# Confirm the emoji match
+echo ':verify confirm'
+
+% iamb, matrix, e2ee
+# Emoji don't match: reject the verification
+echo ':verify mismatch'
+
+% iamb, matrix, e2ee
+# Cancel a verification
+echo ':verify cancel'
+
+% iamb, matrix, e2ee
+# Recover secrets from the server backup and verify this session
+echo ':verify recover <recovery_key>'
+
+% iamb, matrix, e2ee
+# Export encryption keys to a file
+echo ':keys export <path> <passphrase>'
+
+% iamb, matrix, e2ee
+# Import encryption keys from a file
+echo ':keys import <path> <passphrase>'
+
+
+# ============================== ROOM MANAGEMENT ==============================
+
+% iamb, matrix, room-admin
+# Create a room (options: ++public ++encrypted ++space ++alias=name)
+echo ':create ++encrypted'
+
+% iamb, matrix, room-admin
+# Invite a user to the focused room
+echo ':invite send <user>'
+
+% iamb, matrix, room-admin
+# Accept / reject the invite of the focused room
+echo ':invite accept  |  :invite reject'
+
+% iamb, matrix, room-admin
+# Set room name / topic
+echo ':room name set <name>  |  :room topic set <topic>'
+
+% iamb, matrix, room-admin
+# Set the room notification level (mute, mentions, keywords, all)
+echo ':room notify set <level>'
+
+% iamb, matrix, room-admin
+# Tag the room (e.g. favourite)
+echo ':room tag set <tag>'
+
+% iamb, matrix, room-admin
+# Mark the room as unread / read
+echo ':room unread set  |  :room unread unset'
+
+% iamb, matrix, room-admin
+# Kick / ban / unban a user
+echo ':room kick <user>  |  :room ban <user>  |  :room unban <user>'
+
+% iamb, matrix, room-admin
+# Show the room's Matrix ID
+echo ':room id show'
+
+% iamb, matrix, room-admin
+# Ignore / unignore a user, show the ignore list
+echo ':ignore set <user>  |  :ignore unset <user>  |  :ignore show'
+
+
+# ============================== PROFILE ==============================
+
+% iamb, matrix, profile
+# Set your display name
+echo ':self name set <nickname>'
+
+% iamb, matrix, profile
+# Set your timezone
+echo ':self timezone set <tz>'
+
+% iamb, matrix, profile
+# Allow or block invites from others
+echo ':self invites set allow  |  :self invites set block'
