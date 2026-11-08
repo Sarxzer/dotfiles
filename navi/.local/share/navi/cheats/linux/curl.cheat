@@ -1,0 +1,354 @@
+; Curl cheatsheet — requests, data, auth, downloads, debugging, TLS, networking, cookies.
+; Shared variable generators are in the "% var-*" blocks; real entries pull them in with "@".
+
+# ============================ SHARED VARIABLES ===============================
+
+% var-method
+
+$ METHOD: printf '%s\n' GET POST PUT PATCH DELETE HEAD OPTIONS --- --header "HTTP method"
+
+% var-header-name
+
+$ HEADER_NAME: printf '%s\n' Accept Authorization Content-Type Origin Referer User-Agent X-Requested-With --- --header "Common request headers"
+
+% var-content-type
+
+$ CONTENT_TYPE: printf '%s\n' application/json application/x-www-form-urlencoded application/xml text/plain multipart/form-data --- --header "Content-Type"
+
+% var-file
+
+$ FILE: ls -p | grep -v / --- --header "Files in the current directory"
+
+% var-key-file
+
+$ KEY_FILE: ls -p | grep -v / --- --header "Private key file"
+
+% var-user-agent
+
+$ USER_AGENT: printf '%s\n' "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0" "curl/8.0" "Wget/1.21" --- --header "User-Agent string"
+
+% var-env
+
+$ ENV_VAR: env | cut -d= -f1 | sort --- --header "Environment variables (pick the one holding your token)"
+
+% var-writeout
+
+$ WRITEOUT: printf '%s\n' '%{http_code}' '%{time_total}' '%{time_starttransfer}' '%{remote_ip}' '%{size_download}' '%{url_effective}' '%{redirect_url}' --- --header "--write-out variables"
+
+% var-timeout
+
+$ TIMEOUT_SECS: printf '%s\n' 2 5 10 30 60 --- --header "Seconds"
+
+% var-retries
+
+$ RETRIES: printf '%s\n' 1 3 5 10 --- --header "Number of retries"
+
+% var-rate
+
+$ RATE: printf '%s\n' 50k 100k 500k 1M 5M --- --header "Max transfer speed"
+
+% var-ip-flag
+
+$ IP_FLAG: printf '%s\n' -4 -6 --- --header "IP version"
+
+% var-http-flag
+
+$ HTTP_FLAG: printf '%s\n' --http1.1 --http2 --http3 --- --header "HTTP version"
+
+% var-tls-flag
+
+$ TLS_FLAG: printf '%s\n' --tlsv1.0 --tlsv1.1 --tlsv1.2 --tlsv1.3 --- --header "Minimum TLS version"
+
+% var-interface
+
+$ INTERFACE: ip -br link | awk '{print $1}' --- --header "Network interfaces"
+
+% var-port
+
+$ PORT: printf '%s\n' 80 443 3000 8080 8443 --- --header "Common ports"
+
+# ================================ BASICS =====================================
+
+% basics, curl
+# GET a URL and print the body
+curl "<URL>"
+
+% basics, curl
+# Quiet, fail on HTTP errors, follow redirects (the sane default for scripts)
+curl -fsSL "<URL>"
+
+% basics, curl
+# Follow redirects
+curl -L "<URL>"
+
+% basics, curl
+# Headers only (sends a HEAD request)
+curl -I "<URL>"
+
+% basics, curl
+# Response headers and body together
+curl -i "<URL>"
+
+% basics, curl
+@ var-method
+# Send a request with a specific HTTP method
+curl -X "<METHOD>" "<URL>"
+
+% basics, curl
+# Compressed response (asks for gzip/br and decodes it)
+curl --compressed "<URL>"
+
+% basics, curl
+# Ask for only part of a file — range like 0-1023
+curl -r "<RANGE>" "<URL>"
+
+% basics, curl
+# Show curl version, protocols and features
+curl -V
+
+# ============================== DATA / BODY ==================================
+
+% data, curl
+# POST JSON — --json sets Content-Type and Accept for you (curl 7.82+)
+curl --json '<JSON>' "<URL>"
+
+% data, curl
+@ var-file
+# POST JSON read from a file
+curl --json @"<FILE>" "<URL>"
+
+% data, curl
+@ var-content-type
+# POST a raw body with a chosen Content-Type
+curl -X POST -H "Content-Type: <CONTENT_TYPE>" -d '<DATA>' "<URL>"
+
+% data, curl
+# POST a form field (application/x-www-form-urlencoded)
+curl -d "<KEY>=<VALUE>" "<URL>"
+
+% data, curl
+# GET with a properly URL-encoded query parameter
+curl -G --data-urlencode "<KEY>=<VALUE>" "<URL>"
+
+% data, curl
+@ var-file
+# Multipart file upload (like an HTML form)
+curl -F "file=@<FILE>" "<URL>"
+
+% data, curl, destructive
+@ var-file
+# Upload a file with PUT — can overwrite whatever is at the URL
+curl -T "<FILE>" "<URL>"
+
+% data, curl, destructive
+# Send a DELETE request
+curl -X DELETE "<URL>"
+
+# ============================== HEADERS / AUTH ===============================
+
+% headers, curl
+@ var-header-name
+# Send a custom header
+curl -H "<HEADER_NAME>: <HEADER_VALUE>" "<URL>"
+
+% headers, curl
+@ var-user-agent
+# Change the User-Agent
+curl -A "<USER_AGENT>" "<URL>"
+
+% headers, curl
+# Set the Referer header
+curl -e "<REFERER>" "<URL>"
+
+% auth, curl
+@ var-env
+# Bearer token read from an env var — keeps the token out of your shell history
+curl -H "Authorization: Bearer $<ENV_VAR>" "<URL>"
+
+% auth, curl
+# Basic auth — prompts for the password so it stays out of history
+curl -u "<USERNAME>" "<URL>"
+
+% auth, curl
+@ var-header-name
+# API key in a header, read from an env var
+curl -H "<HEADER_NAME>: $<ENV_VAR>" "<URL>"
+
+$ ENV_VAR: env | cut -d= -f1 | sort --- --header "Environment variables (pick the one holding your key)"
+
+# ================================ DOWNLOAD ===================================
+
+% download, curl, destructive
+# Download and save with the remote file name — overwrites an existing file
+curl -O "<URL>"
+
+% download, curl
+# Download without overwriting an existing file (curl 7.83+)
+curl --no-clobber -O "<URL>"
+
+% download, curl, destructive
+# Download to a chosen file name — overwrites it if it exists
+curl -o "<OUTPUT_FILE>" "<URL>"
+
+% download, curl
+# Resume an interrupted download
+curl -C - -O "<URL>"
+
+% download, curl
+# Download with a progress bar instead of the stats table
+curl -# -O "<URL>"
+
+% download, curl
+@ var-rate
+# Limit the download speed
+curl --limit-rate "<RATE>" -O "<URL>"
+
+% download, curl
+# Download two files at the same time
+curl -Z -O "<URL>" -O "<URL_2>"
+
+% download, curl
+# Download and untar a .tar.gz in one go
+curl -fsSL "<URL>" | tar -xz
+
+% download, curl
+# Download a script to read before running it
+curl -fsSL "<URL>" -o "<SCRIPT_NAME>"
+
+# ============================= DEBUG / INSPECT ===============================
+
+% debug, curl
+# Verbose output — request, response headers, TLS handshake
+curl -v "<URL>"
+
+% debug, curl
+# Full trace with timestamps
+curl --trace-ascii - --trace-time "<URL>"
+
+% debug, curl
+# Only the HTTP status code
+curl -s -o /dev/null -w "%{http_code}\n" "<URL>"
+
+% debug, curl
+@ var-writeout
+# Print a chosen --write-out value and discard the body
+curl -s -o /dev/null -w "<WRITEOUT>\n" "<URL>"
+
+% debug, curl
+# Timing breakdown: DNS, connect, TLS, first byte, total
+curl -s -o /dev/null -w "dns: %{time_namelookup}s\nconnect: %{time_connect}s\ntls: %{time_appconnect}s\nttfb: %{time_starttransfer}s\ntotal: %{time_total}s\n" "<URL>"
+
+% debug, curl
+# Where does this URL really end up after redirects
+curl -sL -o /dev/null -w "%{url_effective}\n" "<URL>"
+
+% debug, curl
+# Dump only the response headers, discard the body
+curl -s -D - -o /dev/null "<URL>"
+
+% debug, curl
+# Pretty-print a JSON response (needs jq)
+curl -s "<URL>" | jq .
+
+# ================================== TLS ======================================
+
+% tls, curl, insecure
+# Skip certificate verification — only for testing, never for real traffic
+curl -k "<URL>"
+
+% tls, curl
+@ var-file
+# Trust a custom CA certificate
+curl --cacert "<FILE>" "<URL>"
+
+% tls, curl
+@ var-file
+@ var-key-file
+# Client certificate authentication (mTLS)
+curl --cert "<FILE>" --key "<KEY_FILE>" "<URL>"
+
+% tls, curl
+# Show the server certificate subject, issuer and expiry
+curl -vI --stderr - "<URL>" | grep -Ei 'subject:|issuer:|expire date|SSL connection'
+
+% tls, curl
+@ var-tls-flag
+# Require a minimum TLS version
+curl "<TLS_FLAG>" "<URL>"
+
+# ================================ NETWORK ====================================
+
+% network, curl
+@ var-ip-flag
+# Force IPv4 or IPv6
+curl "<IP_FLAG>" "<URL>"
+
+% network, curl
+@ var-http-flag
+# Use a specific HTTP version — --http3 needs a curl build with HTTP/3 support
+curl -I "<HTTP_FLAG>" "<URL>"
+
+% network, curl
+@ var-interface
+# Send the request out through a specific network interface
+curl --interface "<INTERFACE>" "<URL>"
+
+% network, curl
+@ var-port
+# Test a host before DNS exists — pin a hostname to an IP
+curl --resolve "<HOST>:<PORT>:<IP>" "<URL>"
+
+% network, curl
+# Use an HTTP proxy — like http://127.0.0.1:8080
+curl -x "<PROXY>" "<URL>"
+
+% network, curl
+# Use a SOCKS5 proxy and resolve DNS through it — like 127.0.0.1:9050
+curl --socks5-hostname "<HOST_PORT>" "<URL>"
+
+# ============================= TIMEOUTS / RETRIES ============================
+
+% reliability, curl
+@ var-timeout
+# Give up connecting after N seconds
+curl --connect-timeout "<TIMEOUT_SECS>" "<URL>"
+
+% reliability, curl
+@ var-timeout
+# Give up on the whole request after N seconds
+curl --max-time "<TIMEOUT_SECS>" "<URL>"
+
+% reliability, curl
+@ var-retries
+# Retry on failure, including connection errors (curl 7.71+)
+curl --retry "<RETRIES>" --retry-delay 2 --retry-all-errors "<URL>"
+
+# ================================ COOKIES ====================================
+
+% cookies, curl
+# Save cookies from a response to a file
+curl -c "<COOKIE_JAR>" "<URL>"
+
+% cookies, curl
+@ var-file
+# Send cookies from a file
+curl -b "<FILE>" "<URL>"
+
+% cookies, curl
+# Send a single cookie inline
+curl -b "<COOKIE_NAME>=<COOKIE_VALUE>" "<URL>"
+
+% cookies, curl
+# Keep a session — read and update the same cookie jar
+curl -b "<COOKIE_JAR>" -c "<COOKIE_JAR>" "<URL>"
+
+# ================================== FUN ======================================
+
+% misc, curl
+# Show your public IP
+curl -s https://ifconfig.me
+
+% misc, curl
+# Weather in the terminal
+curl "wttr.in/<CITY>?format=3"
+
