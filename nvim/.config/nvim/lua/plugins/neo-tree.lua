@@ -11,8 +11,14 @@ return {
     keys = {
       {
         "<C-n>",
-        "<cmd>Neotree toggle<CR>",
-        desc = "Toggle file tree",
+        function()
+          if vim.bo.filetype == "neo-tree" then
+            vim.cmd("wincmd p") -- already in the tree: jump back to the previous window
+          else
+            vim.cmd("Neotree focus") -- open if closed, otherwise just focus it
+          end
+        end,
+        desc = "Focus file tree / go back",
       },
     },
     opts = {
