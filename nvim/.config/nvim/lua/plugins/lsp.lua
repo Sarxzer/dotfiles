@@ -6,7 +6,7 @@ return {
     dependencies = { "mason-org/mason.nvim", "neovim/nvim-lspconfig" },
     opts = {
       -- installed through Mason, then enabled automatically
-      ensure_installed = { "lua_ls", "pyright", "ts_ls", "intelephense", "html", "cssls" ,"rust_analyzer", "emmet_language_server" },
+      ensure_installed = { "lua_ls", "pyright", "ts_ls", "intelephense", "html", "cssls" ,"rust_analyzer", "emmet_language_server", "clangd" },
     },
   },
 
