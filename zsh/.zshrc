@@ -2,6 +2,16 @@
 # Profiling startup time? Uncomment the next line and the `zprof` line at the very end.
 # zmodload zsh/zprof
 
+# fastfetch once per kitty window (tabs/splits share KITTY_PID)
+if [[ -o interactive && -n $KITTY_PID ]] && (( $+commands[fastfetch] )); then
+  _ff_lock="${XDG_RUNTIME_DIR:-/tmp}/.fastfetch-kitty-$KITTY_PID"
+  if [[ ! -e $_ff_lock ]]; then
+    : > "$_ff_lock"
+    hyfetch -b fastfetch --args="--pipe false" | tte --canvas-width 0 --canvas-height -1 --anchor-canvas nw --anchor-text nw --existing-color-handling dynamic laseretch --etch-pattern row_bottom_to_top --etch-speed 3
+  fi
+  unset _ff_lock
+fi
+
 # --- Powerlevel10k instant prompt (keep this block at the very top) ------------
 # Anything that needs console input (password prompts, [y/n]) must go above it.
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
@@ -82,6 +92,18 @@ _have kitten   && alias sshk='kitten ssh'
 _have nvim     && alias vim='nvim'
 _have kcmshell6 && alias mime='kcmshell6 kcm_filetypes'
 alias clr='clear'
+
+# --- Functions -----------------------------------------------------------------
+# y: yazi that cd's into the folder you were in when you quit with q (Q quits without cd)
+if _have yazi; then
+  function y() {
+    local tmp cwd; tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
+    command yazi "$@" --cwd-file="$tmp"
+    IFS= read -r -d '' cwd < "$tmp"
+    [ "$cwd" != "$PWD" ] && [ -d "$cwd" ] && builtin cd -- "$cwd" || builtin true
+    command rm -f -- "$tmp"
+  }
+fi
 
 # --- Environment ---------------------------------------------------------------
 if _have nvim; then

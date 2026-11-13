@@ -9,6 +9,7 @@ return {
 			"ruff",
 			"php-cs-fixer",
 			"phpcs",
+			"markdownlint-cli2",
 		},
 	},
 }
