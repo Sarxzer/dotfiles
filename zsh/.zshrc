@@ -7,7 +7,7 @@ if [[ -o interactive && -n $KITTY_PID ]] && (( $+commands[fastfetch] )); then
   _ff_lock="${XDG_RUNTIME_DIR:-/tmp}/.fastfetch-kitty-$KITTY_PID"
   if [[ ! -e $_ff_lock ]]; then
     : > "$_ff_lock"
-    hyfetch -b fastfetch --args="--pipe false" | tte --canvas-width 0 --canvas-height -1 --anchor-canvas nw --anchor-text nw --existing-color-handling dynamic laseretch --etch-pattern row_bottom_to_top --etch-speed 3
+    hyfetch -b fastfetch --args="--pipe false" | tte --canvas-width 0 --canvas-height -1 --anchor-canvas nw --anchor-text nw --existing-color-handling dynamic laseretch --etch-pattern row_bottom_to_top --etch-speed 5
   fi
   unset _ff_lock
 fi

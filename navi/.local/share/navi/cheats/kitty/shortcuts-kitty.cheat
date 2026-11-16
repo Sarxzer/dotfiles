@@ -45,6 +45,17 @@ echo "Ctrl+Shift+Alt+T"
 echo "Alt+<num 1-9>"
 
 
+% kitty, tabs
+# (custom) Detach current kitty tab into a dedicated window
+echo "Ctrl+Shift+Alt+D"
+
+
+% kitty, tabs
+# (custom) Detach current kitty tab into a dedicated window and ask
+echo "Ctrl+Shift+Alt+M"
+
+
+
 # ============================== PANES / SPLITS ==============================
 
 % kitty, splits

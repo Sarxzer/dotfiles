@@ -17,6 +17,7 @@ return {
 				"emmet_language_server",
 				"clangd",
 				"marksman",
+				"texlab",
 			},
 		},
 	},
